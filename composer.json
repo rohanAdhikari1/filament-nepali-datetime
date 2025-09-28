@@ -1,0 +1,75 @@
+{
+    "name": "rohanadhikari/filament-nepali-datetime",
+    "description": "A wrapper for Filament Component like FilamentDateTimePicker,TextColumn,TextEntry to support Nepali Date.",
+    "keywords": [
+        "rohanadhikari",
+        "laravel",
+        "filament-nepali-datetime"
+    ],
+    "homepage": "https://github.com/rohanadhikari/filament-nepali-datetime",
+    "support": {
+        "issues": "https://github.com/rohanadhikari/filament-nepali-datetime/issues",
+        "source": "https://github.com/rohanadhikari/filament-nepali-datetime"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rohan Adhikari",
+            "email": "official@rohanadhikari.com.np",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "filament/forms": "^4.0",
+        "filament/infolists": "^4.0",
+        "filament/tables": "^4.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^2.11",
+        "laravel/pint": "^1.25",
+        "orchestra/testbench-core": "^9.16",
+        "pestphp/pest": "^2.36",
+        "pestphp/pest-plugin-arch": "^2.7",
+        "pestphp/pest-plugin-laravel": "^2.4",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^1.2",
+        "phpstan/phpstan-phpunit": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "RohanAdhikari\\FilamentNepaliDatetime\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RohanAdhikari\\FilamentNepaliDatetime\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RohanAdhikari\\FilamentNepaliDatetime\\FilamentNepaliDatetimeServiceProvider"
+            ],
+            "aliases": {
+                "FilamentNepaliDatetime": "RohanAdhikari\\FilamentNepaliDatetime\\Facades\\FilamentNepaliDatetime"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
