@@ -58,11 +58,13 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
                 if (blank($state)) {
                     return null;
                 }
+
                 return NepaliDate::fromAd(Carbon::parse($state)
                     ->setTimezone($timezone ?? $column->getTimezone()))
                     ->locale($locale)
                     ->format($format);
             });
+
             return $this;
         });
         TextEntry::macro('nepaliDate', function (string $format = 'Y-m-d', string $locale = 'en', ?string $timezone = null) {
@@ -71,11 +73,13 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
                 if (blank($state)) {
                     return null;
                 }
+
                 return NepaliDate::fromAd(Carbon::parse($state)
                     ->setTimezone($timezone ?? $component->getTimezone()))
                     ->locale($locale)
                     ->format($format);
             });
+
             return $this;
         });
     }

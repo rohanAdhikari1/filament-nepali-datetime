@@ -2,5 +2,5 @@
 
 // config for RohanAdhikari/FilamentNepaliDatetime
 return [
-    'default-format' => ""
+    'default-format' => '',
 ];

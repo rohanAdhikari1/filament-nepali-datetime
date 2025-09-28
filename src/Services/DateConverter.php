@@ -224,10 +224,9 @@ abstract class DateConverter
         9 => '९',
     ];
 
-
-
     protected const NORMAL_MONTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    protected const LEAP_MONTHS   = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    protected const LEAP_MONTHS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     /* ------------------------
        Lookup Helpers
@@ -251,7 +250,8 @@ abstract class DateConverter
         if ($month === false) {
             throw new InvalidArgumentException("Invalid BS month name: $name");
         }
-        return (int)$month;
+
+        return (int) $month;
     }
 
     public static function getBSMonthNumberFromNepali(string $name): int
@@ -262,7 +262,8 @@ abstract class DateConverter
         if ($month === false) {
             throw new InvalidArgumentException("Invalid BS month name: $name");
         }
-        return (int)$month;
+
+        return (int) $month;
     }
 
     public static function getBSMonthInEnglish($month): string
@@ -270,12 +271,10 @@ abstract class DateConverter
         return self::$bsMonthInEnglish[$month] ?? throw new InvalidArgumentException("Invalid BS month: $month");
     }
 
-
     public static function getBSMonthInNepali($month): string
     {
         return self::$bsMonthInNepali[$month] ?? throw new InvalidArgumentException("Invalid BS month: $month");
     }
-
 
     public static function getDayOfWeekInEnglish(int $day): string
     {
@@ -305,7 +304,8 @@ abstract class DateConverter
         if ($day === false) {
             throw new InvalidArgumentException("Invalid day name: $name");
         }
-        return (int)$day;
+
+        return (int) $day;
     }
 
     public static function getDayOfWeekNumberFromNepali(string $name): int
@@ -316,27 +316,28 @@ abstract class DateConverter
         if ($day === false) {
             throw new InvalidArgumentException("Invalid day name: $name");
         }
-        return (int)$day;
-    }
 
+        return (int) $day;
+    }
 
     public static function getNumberInNepali(int $number): string
     {
         return self::$numbersInNepali[$number] ?? throw new InvalidArgumentException("Invalid number: $number");
     }
 
-    public static function toNepaliDigits(int|string $value): string
+    public static function toNepaliDigits(int | string $value): string
     {
-        $valueStr = (string)$value;
+        $valueStr = (string) $value;
+
         return str_replace(range(0, 9), self::$numbersInNepali, $valueStr);
     }
 
-    public static function toEnglishDigits(int|string $value): string
+    public static function toEnglishDigits(int | string $value): string
     {
-        $valueStr = (string)$value;
+        $valueStr = (string) $value;
+
         return str_replace(self::$numbersInNepali, range(0, 9), $valueStr);
     }
-
 
     /* ------------------------
        Validation
@@ -400,6 +401,7 @@ abstract class DateConverter
 
         return $totalDays + $day;
     }
+
     /**
      * Calculate total days from a reference Nepali date to the specified Nepali date.
      *
@@ -433,9 +435,9 @@ abstract class DateConverter
     /**
      * Convert an AD (Gregorian) date to BS (Bikram Sambat).
      *
-     * @param int $yy AD year (1944–2033 supported)
-     * @param int $mm AD month (1–12)
-     * @param int $dd AD day
+     * @param  int  $yy  AD year (1944–2033 supported)
+     * @param  int  $mm  AD month (1–12)
+     * @param  int  $dd  AD day
      * @return array{year:int, month:int, day:int, dayOfWeek:int}
      */
     public function convertADToBS(int $yy, int $mm, int $dd): array
@@ -444,9 +446,9 @@ abstract class DateConverter
 
         $totalAdDays = $this->calculateTotalEnglishDays($yy, $mm, $dd);
 
-        $bsYear  = 2000;
+        $bsYear = 2000;
         $bsMonth = 1;
-        $bsDay   = 1;
+        $bsDay = 1;
         $dayOfWeek = 4;
 
         $i = 0;
@@ -487,9 +489,9 @@ abstract class DateConverter
     /**
      * Convert a BS (Bikram Sambat) date to AD (Gregorian).
      *
-     * @param int $yy BS year (2000–2089 supported)
-     * @param int $mm BS month (1–12)
-     * @param int $dd BS day
+     * @param  int  $yy  BS year (2000–2089 supported)
+     * @param  int  $mm  BS month (1–12)
+     * @param  int  $dd  BS day
      * @return array{year:int, month:int, day:int, dayOfWeek:int}
      */
     public function convertBSToAD(int $yy, int $mm, int $dd): array
@@ -497,9 +499,9 @@ abstract class DateConverter
         $this->validateNepaliDate($yy, $mm, $dd);
         $totalBsDays = $this->calculateTotalNepaliDays($yy, $mm, $dd);
 
-        $adYear  = 1943;
+        $adYear = 1943;
         $adMonth = 4;
-        $adDay   = 13;
+        $adDay = 13;
 
         while ($totalBsDays > 0) {
             $adDay++;
