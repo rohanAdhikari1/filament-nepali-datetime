@@ -21,11 +21,13 @@ trait HaveMacro
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliDate::fromAd(Carbon::parse($state)
                         ->setTimezone($timezone ?? $column->getTimezone()))
                         ->locale($locale)
                         ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
                 });
+
                 return $this;
             }),
             TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
@@ -34,10 +36,12 @@ trait HaveMacro
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliDate::parse($state, $stateFormat)
                         ->locale($locale)
                         ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
                 });
+
                 return $this;
             }),
         ];
@@ -52,11 +56,13 @@ trait HaveMacro
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliDate::fromAd(Carbon::parse($state)
                         ->setTimezone($timezone ?? $component->getTimezone()))
                         ->locale($locale)
                         ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
                 });
+
                 return $this;
             }),
             TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
@@ -65,32 +71,38 @@ trait HaveMacro
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliDate::parse($state, $stateFormat)
                         ->locale($locale)
                         ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
                 });
+
                 return $this;
             }),
             TextEntry::macro('nepaliNumber', function (string | bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true) {
                 /** @var TextEntry $this */
-                $this->formatStateUsing(static function ($state) use ($currencySymbol,  $only, $locale, $format): ?string {
+                $this->formatStateUsing(static function ($state) use ($currencySymbol, $only, $locale, $format): ?string {
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliCurrency::getNepaliCurrency($state, $format, $currencySymbol, $only, $locale);
                 });
+
                 return $this;
             }),
             TextEntry::macro('nepaliWord', function (bool $currency = false, $only = false, string $locale = 'en') {
                 /** @var TextEntry $this */
-                $this->formatStateUsing(static function ($state) use ($currency,  $only, $locale): ?string {
+                $this->formatStateUsing(static function ($state) use ($currency, $only, $locale): ?string {
                     if (blank($state)) {
                         return null;
                     }
+
                     return NepaliCurrency::getNepaliWord($state, $currency, $locale, $only);
                 });
+
                 return $this;
-            })
+            }),
         ];
     }
 }

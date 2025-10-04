@@ -7,41 +7,41 @@ use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliDate;
 
 final class NepaliDateTest extends TestCase
 {
-    public function testAdConvert(): void
+    public function test_ad_convert(): void
     {
         $date = NepaliDate::create(2082, 6, 12)->toAd();
         $this->assertEquals('2025-09-28', $date->format('Y-m-d'));
     }
 
-    public function testNumericFormatEN(): void
+    public function test_numeric_format_en(): void
     {
         $date = NepaliDate::create(2082, 6, 12)->locale('en');
         $this->assertEquals('2082-06-12', $date->format('Y-m-d'));
         $this->assertEquals('12-06-2082', $date->format('d-m-Y'));
     }
 
-    public function testNumericFormatNP(): void
+    public function test_numeric_format_np(): void
     {
         $date = NepaliDate::create(2082, 6, 12)->locale('np');
         $this->assertEquals('२०८२-०६-१२', $date->format('Y-m-d'));
         $this->assertEquals('१२-०६-२०८२', $date->format('d-m-Y'));
     }
 
-    public function testNamedFormatEN(): void
+    public function test_named_format_en(): void
     {
         $date = NepaliDate::create(2082, 6, 12)->locale('en');
         $this->assertEquals('Sunday, 12 Ashoj 2082', $date->format('l, j F Y'));
         $this->assertEquals('Sun, 12 Aso 2082', $date->format('D, j M Y'));
     }
 
-    public function testNamedFormatNP(): void
+    public function test_named_format_np(): void
     {
         $date = NepaliDate::create(2082, 6, 12)->locale('np');
         $this->assertEquals('आइतवार, १२ असोज २०८२', $date->format('l, j F Y'));
         $this->assertEquals('आइत, १२ असो २०८२', $date->format('D, j M Y'));
     }
 
-    public function testParseNumericEN(): void
+    public function test_parse_numeric_en(): void
     {
         $date = NepaliDate::parse('2082-06-12', 'Y-m-d', 'en');
         $this->assertEquals(2082, $date->bsYear);
@@ -49,7 +49,7 @@ final class NepaliDateTest extends TestCase
         $this->assertEquals(12, $date->bsDay);
     }
 
-    public function testParseNumericNP(): void
+    public function test_parse_numeric_np(): void
     {
         $date = NepaliDate::parse('२०८२-०६-१२', 'Y-m-d', 'np');
         $this->assertEquals(2082, $date->bsYear);
@@ -57,7 +57,7 @@ final class NepaliDateTest extends TestCase
         $this->assertEquals(12, $date->bsDay);
     }
 
-    public function testParseNamedEN(): void
+    public function test_parse_named_en(): void
     {
         $date = NepaliDate::parse('Sunday, 12 Ashoj 2082', 'l, j F Y', 'en');
         $this->assertEquals(2082, $date->bsYear);
@@ -65,7 +65,7 @@ final class NepaliDateTest extends TestCase
         $this->assertEquals(12, $date->bsDay);
     }
 
-    public function testParseNamedNP(): void
+    public function test_parse_named_np(): void
     {
         $date = NepaliDate::parse('आइतवार, १२ असोज २०८२', 'l, j F Y', 'np');
         $this->assertEquals(2082, $date->bsYear);
@@ -191,8 +191,7 @@ final class NepaliDateTest extends TestCase
     //     $this->assertEquals('२०८२', $date->year());
     // }
 
-
-    public function testFromAdWithCarbonInstance(): void
+    public function test_from_ad_with_carbon_instance(): void
     {
         $carbonDate = \Carbon\Carbon::create(2025, 9, 28);
         $date = NepaliDate::fromAd($carbonDate);
@@ -202,7 +201,7 @@ final class NepaliDateTest extends TestCase
         $this->assertEquals(12, $date->day());
     }
 
-    public function testFromAdWithString(): void
+    public function test_from_ad_with_string(): void
     {
         $date = NepaliDate::fromAd('2025-09-28');
         $this->assertInstanceOf(NepaliDate::class, $date);

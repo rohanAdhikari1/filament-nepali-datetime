@@ -31,6 +31,7 @@ class NepaliDateTimeStateCast implements StateCast
                 }
             }
         }
+
         return $state->locale($this->locale)->format($this->format);
     }
 
@@ -45,6 +46,7 @@ class NepaliDateTimeStateCast implements StateCast
         if ($state instanceof NepaliDate) {
             $state = $state->locale('en')->format($this->internalFormat);
         }
+
         return $state;
     }
 }

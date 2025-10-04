@@ -6,13 +6,13 @@ use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliCurrency;
 
 class NepaliCurrencyTest extends TestCase
 {
-    public function testCurrencyConvert(): void
+    public function test_currency_convert(): void
     {
         $money = NepaliCurrency::getNepaliCurrency('1890567567568576568.14', true, false, false);
         $this->assertEquals('१८,९०,५६,७५,६७,५६,८५,७६,५६८.१४', $money);
     }
 
-    public function testNumberToWordEn(): void
+    public function test_number_to_word_en(): void
     {
         $word1 = NepaliCurrency::getNepaliWord('123456000.12', locale: 'en');
         $this->assertEquals('Twelve Crore Thirty Four Lakh Fifty Six Thousand Rupees and Twelve Paisa', $word1);
@@ -21,8 +21,7 @@ class NepaliCurrencyTest extends TestCase
         $this->assertEquals('Eighteen Shankh Ninety Padma Fifty Six Neel Seventy Five Kharab Sixty Seven Arab Fifty Six Crore Eighty Five Lakh Seventy Six Thousand Five Hundred Sixty Eight Rupees and Fourteen Paisa', $word2);
     }
 
-
-    public function testNumberToWordNp(): void
+    public function test_number_to_word_np(): void
     {
         $word1 = NepaliCurrency::getNepaliWord('123456000.12');
         $this->assertEquals('बाह्र करोड चौतीस लाख छपन्न हजार रुपैंया, बाह्र पैसा', $word1);
