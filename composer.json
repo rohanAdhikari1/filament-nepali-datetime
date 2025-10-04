@@ -64,10 +64,7 @@
         "laravel": {
             "providers": [
                 "RohanAdhikari\\FilamentNepaliDatetime\\FilamentNepaliDatetimeServiceProvider"
-            ],
-            "aliases": {
-                "FilamentNepaliDatetime": "RohanAdhikari\\FilamentNepaliDatetime\\Facades\\FilamentNepaliDatetime"
-            }
+            ]
         }
     },
     "minimum-stability": "dev",

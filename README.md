@@ -1,13 +1,11 @@
-# A wrapper for Filament Component like FilamentDateTimePicker,TextColumn,TextEntry to support Nepali Date.
+# 📅 Filament Nepali Date Time Support
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/rohanadhikari/filament-nepali-datetime.svg?style=flat-square)](https://packagist.org/packages/rohanadhikari/filament-nepali-datetime)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/rohanadhikari/filament-nepali-datetime/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/rohanadhikari/filament-nepali-datetime/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/rohanadhikari/filament-nepali-datetime/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/rohanadhikari/filament-nepali-datetime/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/rohanadhikari/filament-nepali-datetime.svg?style=flat-square)](https://packagist.org/packages/rohanadhikari/filament-nepali-datetime)
 
-
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+A FilamentPHP plugin that adds support for Nepali Date (Bikram Sambat - BS) in Filament’s form, infolist and table components such as
 
 ## Installation
 
@@ -70,8 +68,8 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Rohan Adhikari](https://github.com/rohanAdhikari1)
-- [All Contributors](../../contributors)
+-   [Rohan Adhikari](https://github.com/rohanAdhikari1)
+-   [All Contributors](../../contributors)
 
 ## License
 

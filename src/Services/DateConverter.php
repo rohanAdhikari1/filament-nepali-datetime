@@ -445,9 +445,9 @@ abstract class DateConverter
         $totalAdDays = $this->calculateTotalEnglishDays($yy, $mm, $dd);
 
         $bsYear  = 2000;
-        $bsMonth = 1;
-        $bsDay   = 1;
-        $dayOfWeek = 4;
+        $bsMonth = 9;
+        $bsDay   = 16;
+        $dayOfWeek = 7;
 
         $i = 0;
         $j = $bsMonth;

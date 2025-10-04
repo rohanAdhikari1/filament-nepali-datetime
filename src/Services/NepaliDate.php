@@ -22,14 +22,14 @@ class NepaliDate extends DateConverter
         return self::fromAd(Carbon::now());
     }
 
-    public static function create(int $year, int $month, int $day): self
+    public static function create(int $year, int $month, int $day, int $hour = 0, int $minute = 0, int $second = 0): self
     {
         $instance = new self();
         $instance->bsYear = $year;
         $instance->bsMonth = $month;
         $instance->bsDay = $day;
         $ad = $instance->convertBsToAd($year, $month, $day);
-        $instance->adDate = Carbon::create($ad['year'], $ad['month'], $ad['day']);
+        $instance->adDate = Carbon::create($ad['year'], $ad['month'], $ad['day'], $hour, $minute, $second);
         return $instance;
     }
 
@@ -44,53 +44,109 @@ class NepaliDate extends DateConverter
         return $instance;
     }
 
-    public static function parse(string $dateString, string $format = 'Y-m-d', string $locale = 'en'): self
+
+
+    public static function parse(string $dateString, ?string $format = null, ?string $locale = null): self
     {
+        $locale ??= preg_match('/[०-९]/u', $dateString) ? 'np' : 'en';
         if ($locale === 'np') {
             $dateString = self::toEnglishDigits($dateString);
         }
 
+        // Supported tokens
         $tokenPatterns = [
+            // Year
             'Y' => '(?P<Y>\d{4})',
             'y' => '(?P<y>\d{2})',
+
+            // Month
             'm' => '(?P<m>\d{1,2})',
             'n' => '(?P<n>\d{1,2})',
-            'd' => '(?P<d>\d{1,2})',
-            'j' => '(?P<j>\d{1,2})',
             'F' => '(?P<F>[^,\s]+)',
             'M' => '(?P<M>[^,\s]+)',
+
+            // Day
+            'd' => '(?P<d>\d{1,2})',
+            'j' => '(?P<j>\d{1,2})',
+
+            // Weekday
             'l' => '(?P<l>[^,\s]+)',
             'D' => '(?P<D>[^,\s]+)',
+
+            // Time
+            'H' => '(?P<H>\d{2})',
+            'i' => '(?P<i>\d{2})',
+            's' => '(?P<s>\d{2})',
+            'u' => '(?P<u>\d{1,6})', // microseconds
+
+            // AM/PM
+            'a' => '(?P<a>am|pm)',
+            'A' => '(?P<A>AM|PM)',
         ];
 
-        $regex = preg_replace_callback('/[A-Za-z]/', fn($m) => $tokenPatterns[$m[0]] ?? $m[0], $format);
+        // Common patterns if no format explicitly given
+        $commonFormats = $format
+            ? [$format]
+            : [
+                'Y-m-dTH:i:s.uZ',   // ISO8601 with microseconds + Z
+                'Y-m-dTH:i:sZ',     // ISO8601 with Z
+                'Y-m-dTH:i:s',      // ISO8601 without Z
+                'Y-m-d H:i:s',      // Standard datetime
+                'Y-m-d',            // Date only
+                'd-m-Y',            // European
+                'm/d/Y',            // US
+            ];
 
-        if (!preg_match("/^{$regex}$/u", $dateString, $matches)) {
-            throw new InvalidArgumentException("Date string does not match format: $format");
+        foreach ($commonFormats as $fmt) {
+            $regex = preg_replace_callback('/[A-Za-z]/', fn($m) => $tokenPatterns[$m[0]] ?? $m[0], $fmt);
+
+            if (!preg_match('#^' . $regex . '$#u', $dateString, $matches)) {
+                continue; // try next format
+            }
+
+            // Year
+            $year = $matches['Y'] ?? (isset($matches['y']) ? (int)('20' . $matches['y']) : null);
+
+            // Month
+            if (!empty($matches['F'])) {
+                $month = $locale === 'np'
+                    ? self::getBSMonthNumberFromNepali($matches['F'])
+                    : self::getBSMonthNumberFromEnglish($matches['F']);
+            } elseif (!empty($matches['M'])) {
+                $month = $locale === 'np'
+                    ? self::getBSMonthNumberFromNepali($matches['M'])
+                    : self::getBSMonthNumberFromEnglish($matches['M']);
+            } else {
+                $month = $matches['m'] ?? $matches['n'] ?? null;
+            }
+
+            // Day
+            $day = $matches['d'] ?? $matches['j'] ?? null;
+
+            if (!$year || !$month || !$day) {
+                continue;
+            }
+
+            // Time
+            $hour   = $matches['H'] ?? $matches['G'] ?? $matches['h'] ?? $matches['g'] ?? 0;
+            $minute = $matches['i'] ?? 0;
+            $second = $matches['s'] ?? 0;
+
+            // AM/PM
+            if (isset($matches['a']) || isset($matches['A'])) {
+                $ampm = strtolower($matches['a'] ?? $matches['A']);
+                $hour = (int)$hour;
+                if ($ampm === 'pm' && $hour < 12) $hour += 12;
+                if ($ampm === 'am' && $hour == 12) $hour = 0;
+            }
+
+            return self::create((int)$year, (int)$month, (int)$day, (int)$hour, (int)$minute, (int)$second)
+                ->locale($locale);
         }
 
-        $year = $matches['Y'] ?? (isset($matches['y']) ? (int)('20' . $matches['y']) : null);
-
-        if (!empty($matches['F'])) {
-            $month = $locale === 'np'
-                ? self::getBSMonthNumberFromNepali($matches['F'])
-                : self::getBSMonthNumberFromEnglish($matches['F']);
-        } elseif (!empty($matches['M'])) {
-            $month = $locale === 'np'
-                ? self::getBSMonthNumberFromNepali($matches['M'])
-                : self::getBSMonthNumberFromEnglish($matches['M']);
-        } else {
-            $month = $matches['m'] ?? $matches['n'] ?? null;
-        }
-
-        $day = $matches['d'] ?? $matches['j'] ?? null;
-
-        if (!$year || !$month || !$day) {
-            throw new InvalidArgumentException("Invalid parsed date: {$dateString}");
-        }
-
-        return self::create((int)$year, (int)$month, (int)$day)->locale($locale);
+        throw new InvalidArgumentException("Failed to parse date string: {$dateString}");
     }
+
 
     public function year(): int
     {
@@ -127,12 +183,17 @@ class NepaliDate extends DateConverter
         ];
     }
 
-    public function format(string $format = 'y-m-d'): string
+    public function format(string $format = 'Y-m-d'): string
     {
         $year = (string)$this->bsYear;
         $month = $this->bsMonth;
         $day = $this->bsDay;
         $dow = $this->dayOfWeek;
+
+        $hour24 = $this->adDate->hour;
+        $hour12 = $hour24 % 12 ?: 12;
+        $minute = $this->adDate->minute;
+        $second = $this->adDate->second;
 
         $replacements = [
             // Year
@@ -152,11 +213,19 @@ class NepaliDate extends DateConverter
             // Day of week
             'l' => $this->locale === 'np' ? self::getDayOfWeekInNepali($dow) : self::getDayOfWeekInEnglish($dow),
             'D' => $this->locale === 'np' ? self::getDayOfWeekShortInNepali($dow) : self::getDayOfWeekShortInEnglish($dow),
+
+
+            'H' => str_pad((string)$hour24, 2, '0', STR_PAD_LEFT),
+            'G' => (string)$hour24,
+            'h' => str_pad((string)$hour12, 2, '0', STR_PAD_LEFT),
+            'g' => (string)$hour12,
+            'i' => str_pad((string)$minute, 2, '0', STR_PAD_LEFT),
+            's' => str_pad((string)$second, 2, '0', STR_PAD_LEFT),
+            'a' => $hour24 < 12 ? 'am' : 'pm',
+            'A' => $hour24 < 12 ? 'AM' : 'PM',
         ];
         return preg_replace_callback('/[A-Za-z]/u', fn($m) => $replacements[$m[0]] ?? $m[0], $format);
     }
-
-
 
     public function locale(string $locale): self
     {
@@ -170,84 +239,84 @@ class NepaliDate extends DateConverter
     public function addDay(): self
     {
         $this->adDate->addDay();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subDay(): self
     {
         $this->adDate->subDay();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function addDays(int $days): self
     {
         $this->adDate->addDays($days);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subDays(int $days): self
     {
         $this->adDate->subDays($days);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function addMonth(): self
     {
         $this->adDate->addMonth();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subMonth(): self
     {
         $this->adDate->subMonth();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function addMonths(int $months): self
     {
         $this->adDate->addMonths($months);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subMonths(int $months): self
     {
         $this->adDate->subMonths($months);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function addyear(): self
     {
         $this->adDate->addYear();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subYear(): self
     {
         $this->adDate->subYear();
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function addyears(int $years): self
     {
         $this->adDate->addYears($years);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 
     public function subYears(int $years): self
     {
         $this->adDate->subMonths($years);
-        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate['year'], $this->adDate['month'], $this->adDate['day']);
+        [$this->bsYear, $this->bsMonth, $this->bsDay, $this->dayOfWeek] = $this->convertADToBS($this->adDate->year, $this->adDate->month, $this->adDate->day);
         return $this;
     }
 }
