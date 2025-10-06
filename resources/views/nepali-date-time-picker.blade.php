@@ -67,6 +67,7 @@
                             isOpen() ? selectDate() : togglePanelVisibility()
                         }
                     "
+                x-on:keydown.space.prevent.stop="if (! $el.disabled) selectFocusedDay()"
                 x-on:keydown.alt.arrow-left.prevent.stop="if (! $el.disabled) focusPreviousMonth()"
                 x-on:keydown.alt.arrow-right.prevent.stop="if (! $el.disabled) focusNextMonth()"
                 x-on:keydown.alt.arrow-up.prevent.stop="if (! $el.disabled) focusPreviousYear()"
@@ -75,6 +76,12 @@
                 x-on:keydown.arrow-right.prevent.stop="if (! $el.disabled) focusNextDay()"
                 x-on:keydown.arrow-up.prevent.stop="if (! $el.disabled) focusPreviousWeek()"
                 x-on:keydown.arrow-down.prevent.stop="if (! $el.disabled) focusNextWeek()"
+                x-on:keydown.home.prevent.stop="if (! $el.disabled) focusStartOfWeek()"
+                x-on:keydown.end.prevent.stop="if (! $el.disabled) focusEndOfWeek()"
+                x-on:keydown.page-up.prevent.stop="if (! $el.disabled) focusPreviousMonth()"
+                x-on:keydown.page-down.prevent.stop="if (! $el.disabled) focusNextMonth()"
+                x-on:keydown.shift.page-up.prevent.stop="if (! $el.disabled) focusPreviousYear()"
+                x-on:keydown.shift.page-down.prevent.stop="if (! $el.disabled) focusNextYear()"
                 x-on:keydown.backspace.prevent.stop="if (! $el.disabled) clearState()"
                 x-on:keydown.clear.prevent.stop="if (! $el.disabled) clearState()"
                 x-on:keydown.delete.prevent.stop="if (! $el.disabled) clearState()" aria-label="{{ $placeholder }}"

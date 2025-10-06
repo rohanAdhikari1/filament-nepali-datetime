@@ -2,10 +2,11 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/rohanadhikari/filament-nepali-datetime.svg?style=flat-square)](https://packagist.org/packages/rohanadhikari/filament-nepali-datetime)
 [![Filament v4](https://img.shields.io/badge/Filament-v4-ffba00?style=flat-square)](https://filamentphp.com/)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/rohanadhikari/filament-nepali-datetime/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/rohanadhikari/filament-nepali-datetime/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/rohanadhikari1/filament-nepali-datetime/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/rohanadhikari1/filament-nepali-datetime/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/rohanadhikari/filament-nepali-datetime.svg?style=flat-square)](https://packagist.org/packages/rohanadhikari/filament-nepali-datetime)
 
 A FilamentPHP plugin that adds support for Nepali Date (Bikram Sambat - BS) in Filament’s form, infolist and table components.
+![Banner](.github/screenshots/banner.jpg)
 
 ## Installation
 
@@ -84,7 +85,7 @@ NepaliDatePicker::make('dob')
 
 ### Saving Date in Nepali Format
 
-By Default, Datetime is saved in english format even locale is 'en'. You can configure it to save in **Nepali Unicode** in the database.
+By Default, Datetime is saved in english format even locale is 'np'. You can configure it to save in **Nepali Unicode** in the database.
 
 > [!WARNING]  
 > In Laravel migrations, **don’t use** `timestamp` for Nepali dates. Instead, use `string`, because `timestamp` and `datetime` cannot store Unicode characters.
@@ -106,6 +107,43 @@ These methods support **NepaliDate**, **Carbon**, or **NepaliDate string** (`Y-m
 | `disabledDates()`      | Disables specific dates (array of Carbon/NepaliDate/strings) | `->disabledDates([NepaliDate::now(),now()])` |
 | `maxDate()`            | Sets the maximum selectable date                             | `->maxDate(NepaliDate::now())`               |
 | `minDate()`            | Sets the minimum selectable date                             | `->minDate(now()->subYear(20))`              |
+
+---
+
+### DatePicker Key Bindings
+
+The DatePicker supports keyboard navigation for accessibility and ease of use.
+
+#### Navigation
+
+-   **Arrow Left** → Move focus to the previous day
+-   **Arrow Right** → Move focus to the next day
+-   **Arrow Up** → Move focus to the same week day in the previous week
+-   **Arrow Down** → Move focus to the same week day in the next week
+
+#### Month / Year Shortcuts
+
+-   **Alt + Arrow Left** → Focus the previous month
+-   **Alt + Arrow Right** → Focus the next month
+-   **Alt + Arrow Up** → Focus the previous year
+-   **Alt + Arrow Down** → Focus the next year
+
+#### Page Navigation
+
+-   **Page Up** → Previous month
+-   **Page Down** → Next month
+-   **Shift + Page Up** → Previous year
+-   **Shift + Page Down** → Next year
+
+#### Week Navigation
+
+-   **Home** → Jump to the start of the week
+-   **End** → Jump to the end of the week
+
+#### Selection & Clearing
+
+-   **Enter** → Select the currently focused day
+-   **Backspace / Delete / Clear** → Clear the selected date
 
 ---
 

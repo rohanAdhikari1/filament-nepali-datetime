@@ -362,6 +362,17 @@ export default function dateTimePickerFormComponent({
             this.focusedDate.addYear()
         },
 
+        focusStartOfWeek() {
+            this.focusedDate ??= nepalidayjs()
+
+            this.focusedDate.subDays(this.focusedDate.dayOfWeek() - 1)
+        },
+        focusEndOfWeek() {
+            this.focusedDate ??= nepalidayjs()
+
+            this.focusedDate.addDays(7 - this.focusedDate.dayOfWeek())
+        },
+
         getDayLabels() {
             const labels = nepalidayjs.weekdaysShort(locale)
 
