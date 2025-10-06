@@ -103,7 +103,7 @@ class NepaliDate extends DateConverter
             ];
 
         foreach ($commonFormats as $fmt) {
-            $regex = preg_replace_callback('/[A-Za-z]/', fn ($m) => $tokenPatterns[$m[0]] ?? $m[0], $fmt);
+            $regex = preg_replace_callback('/[A-Za-z]/', fn($m) => $tokenPatterns[$m[0]] ?? $m[0], $fmt);
 
             if (! preg_match('#^' . $regex . '$#u', $dateString, $matches)) {
                 continue; // try next format
@@ -209,6 +209,9 @@ class NepaliDate extends DateConverter
         $minute = $this->adDate->minute;
         $second = $this->adDate->second;
 
+        $H = str_pad((string) $hour24, 2, '0', STR_PAD_LEFT);
+        $h = str_pad((string) $hour12, 2, '0', STR_PAD_LEFT);
+
         $replacements = [
             // Year
             'Y' => $this->locale === 'np' ? self::toNepaliDigits($year) : $year,
@@ -228,17 +231,21 @@ class NepaliDate extends DateConverter
             'l' => $this->locale === 'np' ? self::getDayOfWeekInNepali($dow) : self::getDayOfWeekInEnglish($dow),
             'D' => $this->locale === 'np' ? self::getDayOfWeekShortInNepali($dow) : self::getDayOfWeekShortInEnglish($dow),
 
-            'H' => str_pad((string) $hour24, 2, '0', STR_PAD_LEFT),
-            'G' => (string) $hour24,
-            'h' => str_pad((string) $hour12, 2, '0', STR_PAD_LEFT),
-            'g' => (string) $hour12,
-            'i' => str_pad((string) $minute, 2, '0', STR_PAD_LEFT),
-            's' => str_pad((string) $second, 2, '0', STR_PAD_LEFT),
-            'a' => $hour24 < 12 ? 'am' : 'pm',
-            'A' => $hour24 < 12 ? 'AM' : 'PM',
+            'H' => $this->locale === 'np' ? self::toNepaliDigits($H) : $H,
+            'G' => $this->locale === 'np' ? self::toNepaliDigits($hour24) : (string) $hour24,
+            'h' => $this->locale === 'np' ? self::toNepaliDigits($h) : $h,
+            'g' => $this->locale === 'np' ? self::toNepaliDigits($hour12) : (string) $hour12,
+            'i' => $this->locale === 'np' ? self::toNepaliDigits($minute) : (string) $minute,
+            's' => $this->locale === 'np' ? self::toNepaliDigits($second) : (string) $second,
+            'a' => $this->locale === 'np'
+                ? ($hour24 < 12 ? 'पूर्वाह्न' : 'अपराह्न')
+                : ($hour24 < 12 ? 'am' : 'pm'),
+            'A' => $this->locale === 'np'
+                ? ($hour24 < 12 ? 'पूर्वाह्न' : 'अपराह्न')
+                : ($hour24 < 12 ? 'AM' : 'PM'),
         ];
 
-        return preg_replace_callback('/[A-Za-z]/u', fn ($m) => $replacements[$m[0]] ?? $m[0], $format);
+        return preg_replace_callback('/[A-Za-z]/u', fn($m) => $replacements[$m[0]] ?? $m[0], $format);
     }
 
     public function locale(string $locale): self

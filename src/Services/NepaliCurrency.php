@@ -6,7 +6,7 @@ namespace RohanAdhikari\FilamentNepaliDatetime\Services;
 
 use InvalidArgumentException;
 
-class NepaliCurrency
+final class NepaliCurrency
 {
     private static $wordsEn = [
         0 => 'Zero',

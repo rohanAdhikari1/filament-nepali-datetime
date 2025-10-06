@@ -10,7 +10,6 @@ export default function dateTimePickerFormComponent({
     shouldCloseOnDateSelection,
     state,
 }) {
-
     return {
         daysInFocusedMonth: [],
 
@@ -44,16 +43,16 @@ export default function dateTimePickerFormComponent({
 
         init() {
             this.$nextTick(() => {
-                this.focusedDate ??= (
+                this.focusedDate ??=
                     this.getDefaultFocusedDate() ?? nepalidayjs()
-                )
                 this.focusedMonth ??= this.focusedDate.month()
                 this.focusedYear ??= this.focusedDate.year()
             })
 
             let date =
                 this.getSelectedDate() ??
-                this.getDefaultFocusedDate() ?? nepalidayjs()
+                this.getDefaultFocusedDate() ??
+                nepalidayjs()
 
             if (this.getMaxDate() !== null && date.isAfter(this.getMaxDate())) {
                 date = null
@@ -453,14 +452,14 @@ export default function dateTimePickerFormComponent({
 
         setDisplayText() {
             this.displayText = this.getSelectedDate()
-                ? this.getSelectedDate().setLocale('np').format(displayFormat)
+                ? this.getSelectedDate().setLocale(locale).format(displayFormat)
                 : ''
         },
 
         setYears() {
             this.years = Array.from(
                 { length: nepalidayjs.maxYear() - nepalidayjs.minYear() + 1 },
-                (_, i) => nepalidayjs.minYear() + i
+                (_, i) => nepalidayjs.minYear() + i,
             )
         },
 
@@ -477,7 +476,9 @@ export default function dateTimePickerFormComponent({
 
             this.emptyDaysInFocusedMonth = Array.from(
                 {
-                    length: this.focusedDate.day(8 - firstDayOfWeek).dayOfWeek(),
+                    length: this.focusedDate
+                        .day(8 - firstDayOfWeek)
+                        .dayOfWeek(),
                 },
                 (_, i) => i + 1,
             )
