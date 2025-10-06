@@ -15,7 +15,7 @@ trait HaveMacro
     public function getTextColumnMacros(): array
     {
         return [
-            TextColumn::macro('toNepaliDate', function (string | Closure | null $format = null, string $locale = 'en', string | Closure | null $timezone = null) {
+            TextColumn::macro('toNepaliDate', function (string | Closure | null $format = null, string $locale = 'en', string | Closure | null $timezone = null): static {
                 /** @var TextColumn $this */
                 $this->formatStateUsing(static function (TextColumn $column, $state) use ($format, $timezone, $locale): ?string {
                     if (blank($state)) {
@@ -30,7 +30,7 @@ trait HaveMacro
 
                 return $this;
             }),
-            TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
+            TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en'): static {
                 /** @var TextColumn $this */
                 $this->formatStateUsing(static function ($state) use ($format, $locale, $stateFormat): ?string {
                     if (blank($state)) {
@@ -50,7 +50,7 @@ trait HaveMacro
     public function getTextEntryMacros(): array
     {
         return [
-            TextEntry::macro('toNepaliDate', function (string | Closure | null $format = null, string | Closure $locale = 'en', string | Closure | null $timezone = null) {
+            TextEntry::macro('toNepaliDate', function (string | Closure | null $format = null, string | Closure $locale = 'en', string | Closure | null $timezone = null): static {
                 /** @var TextEntry $this */
                 $this->formatStateUsing(static function (TextEntry $component, $state) use ($format, $timezone, $locale): ?string {
                     if (blank($state)) {
@@ -65,7 +65,7 @@ trait HaveMacro
 
                 return $this;
             }),
-            TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
+            TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en'): static {
                 /** @var TextEntry $this */
                 $this->formatStateUsing(static function ($state) use ($format, $locale, $stateFormat): ?string {
                     if (blank($state)) {
@@ -79,7 +79,7 @@ trait HaveMacro
 
                 return $this;
             }),
-            TextEntry::macro('nepaliNumber', function (string | bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true) {
+            TextEntry::macro('nepaliNumber', function (string | bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true): static {
                 /** @var TextEntry $this */
                 $this->formatStateUsing(static function ($state) use ($currencySymbol, $only, $locale, $format): ?string {
                     if (blank($state)) {
@@ -91,7 +91,7 @@ trait HaveMacro
 
                 return $this;
             }),
-            TextEntry::macro('nepaliWord', function (bool $currency = false, $only = false, string $locale = 'en') {
+            TextEntry::macro('nepaliWord', function (bool $currency = false, $only = false, string $locale = 'en'): static {
                 /** @var TextEntry $this */
                 $this->formatStateUsing(static function ($state) use ($currency, $only, $locale): ?string {
                     if (blank($state)) {

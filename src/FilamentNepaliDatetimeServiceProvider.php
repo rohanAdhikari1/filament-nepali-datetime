@@ -49,8 +49,8 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
 
     public function bootingPackage()
     {
-        $this->getTextColumnMacros();
-        $this->getTextEntryMacros();
+        $this->registerTextColumnMacros();
+        $this->registerTextEntryMacros();
     }
 
     public function packageBooted(): void
