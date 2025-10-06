@@ -61,7 +61,52 @@ NepaliDatePicker::make('dob')
 
 ```
 
-<!-- #### Available Nepali Methods -->
+#### Configuring the locale
+
+The picker supports two locales:
+
+-   `'en'` – English
+-   `'np'` – Nepali
+
+```php
+NepaliDatetimePicker::make('dob')
+    ->locale('np');
+```
+
+### Configuring the first day of the week
+
+Similar to [Filament Datetime Picker](https://filamentphp.com/docs/4.x/forms/date-time-picker#configuring-the-first-day-of-the-week). New convenient helper method is added.
+
+```php
+NepaliDatePicker::make('dob')
+    ->weekStartsOnSaturday()
+```
+
+### Saving Date in Nepali Format
+
+By Default, Datetime is saved in english format even locale is 'en'. You can configure it to save in **Nepali Unicode** in the database.
+
+> [!CAUTION]
+
+> In Laravel migrations, **don’t use** `timestamp` for Nepali dates. Instead, use `string`, because `timestamp` and `datetime` cannot store Unicode characters.
+
+```php
+NepaliDatetimePicker::make('dob')
+    ->dehydrateStateToNepali()
+```
+
+---
+
+### Methods Supporting NepaliDate
+
+These methods support **NepaliDate**, **Carbon**, or **NepaliDate string** (`Y-m-d`):
+
+| Method                 | Description                                                  | Example Usage                                |
+| ---------------------- | ------------------------------------------------------------ | -------------------------------------------- |
+| `defaultFocusedDate()` | Sets the default date when the picker opens                  | `->defaultFocusedDate(NepaliDate::now())`    |
+| `disabledDates()`      | Disables specific dates (array of Carbon/NepaliDate/strings) | `->disabledDates([NepaliDate::now(),now()])` |
+| `maxDate()`            | Sets the maximum selectable date                             | `->maxDate(NepaliDate::now())`               |
+| `minDate()`            | Sets the minimum selectable date                             | `->minDate(now()->subYear(20))`              |
 
 ---
 
