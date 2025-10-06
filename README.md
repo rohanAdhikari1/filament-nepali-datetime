@@ -86,8 +86,7 @@ NepaliDatePicker::make('dob')
 
 By Default, Datetime is saved in english format even locale is 'en'. You can configure it to save in **Nepali Unicode** in the database.
 
-> [!CAUTION]
-
+> [!WARNING]  
 > In Laravel migrations, **don’t use** `timestamp` for Nepali dates. Instead, use `string`, because `timestamp` and `datetime` cannot store Unicode characters.
 
 ```php
@@ -118,8 +117,9 @@ The following functions are available on TextColumn and/or TextEntry.
 
 Format a stored BS date into English or Nepali locale. This function can be used in TextColumn and Text Entry both.
 
-⚠️ **Note:** This does **not** convert AD → BS.
-If you want conversion, use [`toNepaliDate()`](#tonepalidate).
+> [!NOTE]  
+> This does **not** convert AD → BS.
+> If you want conversion, use [`toNepaliDate()`](#tonepalidate).
 
 ```php
 TextColumn::make('dob')
