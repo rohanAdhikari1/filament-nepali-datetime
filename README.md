@@ -61,7 +61,7 @@ NepaliDatePicker::make('dob')
 
 ```
 
-#### Configuring the locale
+### Configuring the locale
 
 The picker supports two locales:
 
