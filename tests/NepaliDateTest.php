@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliDate;
+use RohanAdhikari\FilamentNepaliDatetime\Tests\TestCase;
 
 final class NepaliDateTest extends TestCase
 {

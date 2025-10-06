@@ -63,6 +63,8 @@ NepaliDatePicker::make('dob')
 
 <!-- #### Available Nepali Methods -->
 
+---
+
 ### 2. Nepali Functions
 
 The following functions are available on TextColumn and/or TextEntry.
@@ -145,6 +147,8 @@ TextEntry::make('amount')
 | `currency` | `bool`         | `false` | Whether to convert the number into currency words. |
 | `only`     | `bool`         | `false` | If true, Show Only at the end.                     |
 | `locale`   | `'en' \| 'np'` | `'en'`  | Language of the output (English or Nepali).        |
+
+---
 
 ## Changelog
 
