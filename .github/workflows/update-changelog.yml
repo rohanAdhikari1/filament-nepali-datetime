@@ -26,7 +26,13 @@ jobs:
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          branch: main
+          branch: changelog-update-${{ github.run_number }}
           commit_message: Update CHANGELOG
           file_pattern: CHANGELOG.md
-          commit_author: rohanAdhikari1 <82314325+rohanAdhikari1@users.noreply.github.com>
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: changelog-update-${{ github.run_number }}
+          title: "Automated CHANGELOG update"
+          body: "This pull request updates the CHANGELOG file automatically."
+          labels: automated
