@@ -29,3 +29,4 @@ jobs:
           branch: main
           commit_message: Update CHANGELOG
           file_pattern: CHANGELOG.md
+          commit_author: rohanAdhikari1 <82314325+rohanAdhikari1@users.noreply.github.com>
