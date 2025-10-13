@@ -30,7 +30,7 @@ jobs:
           commit_message: Update CHANGELOG
           file_pattern: CHANGELOG.md
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: changelog-update-${{ github.run_number }}
           title: "Automated CHANGELOG update"
