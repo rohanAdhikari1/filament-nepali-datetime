@@ -12,6 +12,3 @@ phpunit.xml
 phpstan.neon
 testbench.yaml
 vendor
-src/Services/Interface/*
-src/Services/Utility/*
-src/Services/NepaliDateInterface.php

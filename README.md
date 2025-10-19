@@ -39,7 +39,12 @@ composer require rohanadhikari/filament-nepali-datetime
 
 ## Usage
 
+To use `NepaliDate` in `NepaliDateTimePicker`, please refer to the documentation of [`NepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP).
+
 ### 1. NepaliDateTimePicker
+
+> [!WARNING]  
+> If you are using `timestamp` and `datetime` column type consider using [`ADAsNepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP/blob/main/docs/LARAVEL.md#cast-attribute-to-nepalidate) cast in model.
 
 It extends Filament [DateTimePicker](https://filamentphp.com/docs/4.x/forms/date-time-picker) to support **Nepali Date (BS)**.
 
@@ -49,15 +54,15 @@ use RohanAdhikari\FilamentNepaliDatetime\NepaliDatePicker;
 
 NepaliDatetimePicker::make('dob')
     ->weekStartsOnSaturday()
-    ->dehydrateStateToNepali()
-    ->locale('np')
+    ->dehydrateStateInNepali()
+    ->locale(NepaliDate::Nepali)
     ->maxDate(NepaliDate::now())
-    ->minDate(now()->subYear(20)), // Suport NepaliDate/ Carbon / Nepalidate string (only support format Y-m-d)
+    ->minDate(now()->subYear(20)), // Suport NepaliDate/ Carbon / Nepalidate string
 
     //or for date only
 NepaliDatePicker::make('dob')
     ->format('d-m-Y')
-    ->locale('np')
+    ->locale(NepaliDate::NEPALI)
     ->maxDate(NepaliDate::now()),
 
 ```
@@ -71,7 +76,7 @@ The picker supports two locales:
 
 ```php
 NepaliDatetimePicker::make('dob')
-    ->locale('np');
+    ->locale(NepaliDate::NEPALI);
 ```
 
 ### Configuring the first day of the week
@@ -92,7 +97,7 @@ By Default, Datetime is saved in english format even locale is 'np'. You can con
 
 ```php
 NepaliDatetimePicker::make('dob')
-    ->dehydrateStateToNepali()
+    ->dehydrateStateInNepali()
 ```
 
 ---
@@ -101,12 +106,12 @@ NepaliDatetimePicker::make('dob')
 
 These methods support **NepaliDate**, **Carbon**, or **NepaliDate string** (`Y-m-d`):
 
-| Method                 | Description                                                  | Example Usage                                |
-| ---------------------- | ------------------------------------------------------------ | -------------------------------------------- |
-| `defaultFocusedDate()` | Sets the default date when the picker opens                  | `->defaultFocusedDate(NepaliDate::now())`    |
-| `disabledDates()`      | Disables specific dates (array of Carbon/NepaliDate/strings) | `->disabledDates([NepaliDate::now(),now()])` |
-| `maxDate()`            | Sets the maximum selectable date                             | `->maxDate(NepaliDate::now())`               |
-| `minDate()`            | Sets the minimum selectable date                             | `->minDate(now()->subYear(20))`              |
+| Method                 | Description                                                  | Example Usage                                          |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| `defaultFocusedDate()` | Sets the default date when the picker opens                  | `->defaultFocusedDate(NepaliDate::now())`              |
+| `disabledDates()`      | Disables specific dates (array of Carbon/NepaliDate/strings) | `->disabledDates([NepaliDate::now(),now()->addDay()])` |
+| `maxDate()`            | Sets the maximum selectable date                             | `->maxDate(NepaliDate::now())`                         |
+| `minDate()`            | Sets the minimum selectable date                             | `->minDate(now()->subYear(20))`                        |
 
 ---
 

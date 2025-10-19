@@ -2,27 +2,25 @@
 
 namespace RohanAdhikari\FilamentNepaliDatetime\Concerns;
 
-use Carbon\Carbon;
 use Closure;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\TextColumn;
 use RohanAdhikari\FilamentNepaliDatetime\FilamentNepaliDatetimeServiceProvider;
-use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliCurrency;
-use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliDate;
+use RohanAdhikari\NepaliDate\NepaliDate;
+use RohanAdhikari\NepaliDate\NepaliNumbers;
 
 trait HaveMacro
 {
     public function registerTextColumnMacros(): void
     {
-        TextColumn::macro('toNepaliDate', function (string|Closure|null $format = null, string $locale = 'en', string|Closure|null $timezone = null): static {
+        TextColumn::macro('toNepaliDate', function (string | Closure | null $format = null, string $locale = 'en', string | Closure | null $timezone = null) {
             /** @var TextColumn $this */
             $this->formatStateUsing(static function (TextColumn $column, $state) use ($format, $timezone, $locale): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliDate::fromAd(Carbon::parse($state)
-                    ->setTimezone($timezone ?? $column->getTimezone()))
+                return NepaliDate::fromNotation($state, $timezone ?? $column->getTimezone())
                     ->locale($locale)
                     ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
             });
@@ -30,14 +28,15 @@ trait HaveMacro
             return $this;
         });
 
-        TextColumn::macro('nepaliDate', function (string|Closure|null $stateFormat = null, string|Closure|null $format = null, string $locale = 'en'): static {
+        TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
             /** @var TextColumn $this */
             $this->formatStateUsing(static function ($state) use ($format, $locale, $stateFormat): ?string {
                 if (blank($state)) {
                     return null;
                 }
+                $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
-                return NepaliDate::parse($state, $stateFormat)
+                return $date
                     ->locale($locale)
                     ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
             });
@@ -48,15 +47,14 @@ trait HaveMacro
 
     public function registerTextEntryMacros(): void
     {
-        TextEntry::macro('toNepaliDate', function (string|Closure|null $format = null, string|Closure $locale = 'en', string|Closure|null $timezone = null): static {
+        TextEntry::macro('toNepaliDate', function (string | Closure | null $format = null, string | Closure $locale = 'en', string | Closure | null $timezone = null) {
             /** @var TextEntry $this */
-            $this->formatStateUsing(static function (TextEntry $component, $state) use ($format, $timezone, $locale): ?string {
+            $this->formatStateUsing(static function (TextEntry $entry, $state) use ($format, $timezone, $locale): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliDate::fromAd(Carbon::parse($state)
-                    ->setTimezone($timezone ?? $component->getTimezone()))
+                return NepaliDate::fromNotation($state, $timezone ?? $entry->getTimezone())
                     ->locale($locale)
                     ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
             });
@@ -64,14 +62,15 @@ trait HaveMacro
             return $this;
         });
 
-        TextEntry::macro('nepaliDate', function (string|Closure|null $stateFormat = null, string|Closure|null $format = null, string $locale = 'en'): static {
+        TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
             /** @var TextEntry $this */
             $this->formatStateUsing(static function ($state) use ($format, $locale, $stateFormat): ?string {
                 if (blank($state)) {
                     return null;
                 }
+                $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
-                return NepaliDate::parse($state, $stateFormat)
+                return $date
                     ->locale($locale)
                     ->format($format ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat());
             });
@@ -79,27 +78,27 @@ trait HaveMacro
             return $this;
         });
 
-        TextEntry::macro('nepaliNumber', function (string|bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true): static {
+        TextEntry::macro('nepaliNumber', function (string | bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true) {
             /** @var TextEntry $this */
             $this->formatStateUsing(static function ($state) use ($currencySymbol, $only, $locale, $format): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliCurrency::getNepaliCurrency($state, $format, $currencySymbol, $only, $locale);
+                return NepaliNumbers::getNepaliCurrency($state, $currencySymbol, $only, $format, $locale);
             });
 
             return $this;
         });
 
-        TextEntry::macro('nepaliWord', function (bool $currency = false, $only = false, string $locale = 'en'): static {
+        TextEntry::macro('nepaliWord', function (bool $currency = false, $only = false, string $locale = 'en') {
             /** @var TextEntry $this */
             $this->formatStateUsing(static function ($state) use ($currency, $only, $locale): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliCurrency::getNepaliWord($state, $currency, $locale, $only);
+                return NepaliNumbers::getNepaliWord($state, $currency, $locale, $only);
             });
 
             return $this;

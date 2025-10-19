@@ -23,40 +23,23 @@
         "php": "^8.2",
         "filament/forms": "^4.0",
         "filament/infolists": "^4.0",
-        "filament/tables": "^4.0"
+        "filament/tables": "^4.0",
+        "rohanadhikari/nepali-date": "^0.0.3"
     },
     "require-dev": {
-        "larastan/larastan": "^3.0",
         "laravel/pint": "^1.0",
-        "orchestra/testbench": "^9.0|^10.0",
-        "pestphp/pest": "^3.7",
-        "pestphp/pest-plugin-laravel": "^3.0",
-        "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.2"
     },
     "autoload": {
         "psr-4": {
             "RohanAdhikari\\FilamentNepaliDatetime\\": "src/"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "RohanAdhikari\\FilamentNepaliDatetime\\Tests\\": "tests/"
-        }
-    },
     "scripts": {
-        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
-        }
+        "format": "vendor/bin/pint",
+        "refactor": "vendor/bin/rector"
     },
     "extra": {
         "laravel": {

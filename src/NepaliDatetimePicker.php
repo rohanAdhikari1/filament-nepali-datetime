@@ -5,9 +5,10 @@ namespace RohanAdhikari\FilamentNepaliDatetime;
 use Carbon\CarbonInterface;
 use Closure;
 use Filament\Forms\Components\DateTimePicker;
-use InvalidArgumentException;
-use RohanAdhikari\FilamentNepaliDatetime\Services\NepaliDate;
+use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
+use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
+use RohanAdhikari\NepaliDate\NepaliDate;
 
 class NepaliDatetimePicker extends DateTimePicker
 {
@@ -21,23 +22,6 @@ class NepaliDatetimePicker extends DateTimePicker
 
     protected bool | Closure $dehydrateStateInNepali = false;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->afterStateHydrated(static function (NepaliDatetimePicker $component, $state): void {
-            $newState = $state;
-            if ($state && ! $state instanceof NepaliDate) {
-                try {
-                    $newState = NepaliDate::parse((string) $state, $component->getFormat())->locale('en')->format($component->getInternalFormat());
-                } catch (InvalidArgumentException) {
-                    $newState = null;
-                }
-            }
-            $component->state($newState);
-        });
-    }
-
     /**
      * @return array<StateCast>
      */
@@ -48,11 +32,12 @@ class NepaliDatetimePicker extends DateTimePicker
                 'format' => $this->getFormat(),
                 'internalFormat' => $this->getInternalFormat(),
                 'locale' => $this->getLocale(),
+                'timezone' => $this->getTimezone(),
             ]),
         ];
     }
 
-    public function dehydrateStateToNepali(Closure | bool $condition = true): static
+    public function dehydrateStateInNepali(Closure | bool $condition = true): static
     {
         $this->dehydrateStateInNepali = $condition;
 
@@ -66,11 +51,19 @@ class NepaliDatetimePicker extends DateTimePicker
 
     public function getMaxDate(): ?string
     {
+        if (blank($this->bsMaxDate)) {
+            return null;
+        }
+
         return $this->getNepaliFormatDate($this->bsMaxDate);
     }
 
     public function getMinDate(): ?string
     {
+        if (blank($this->bsMinDate)) {
+            return null;
+        }
+
         return $this->getNepaliFormatDate($this->bsMinDate);
     }
 
@@ -78,9 +71,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMaxDate = $date;
 
-        $this->rule(static function (NepaliDatetimePicker $component) {
-            return "before_or_equal:{$component->getMaxDate()}";
-        }, static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
+        $this->rule(static fn (NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
 
         return $this;
     }
@@ -89,9 +80,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMinDate = $date;
 
-        $this->rule(static function (NepaliDatetimePicker $component) {
-            return "after_or_equal:{$component->getMinDate()}";
-        }, static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
+        $this->rule(static fn (NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
 
         return $this;
     }
@@ -110,25 +99,31 @@ class NepaliDatetimePicker extends DateTimePicker
         return $this;
     }
 
-    public function getNepaliFormatDate(CarbonInterface | NepaliDate | string | Closure | null $date): ?string
+    public function getNepaliFormatDate(CarbonInterface | NepaliDate | string | Closure $date): ?string
     {
         $date = $this->evaluate($date);
         if ($date instanceof CarbonInterface) {
-            $date = NepaliDate::fromAd($date);
+            $date = NepaliDate::fromAd($date->toDateTime());
         }
-        if ($date instanceof NepaliDate) {
-            $date = $date->format();
+        if (! $date instanceof NepaliDate) {
+            try {
+                $date = NepaliDate::createFromFormat($this->getFormat(), (string) $date);
+            } catch (NepaliDateFormatException) {
+                try {
+                    $date = NepaliDate::parse($date);
+                } catch (NepaliDateFormatException) {
+                    return null;
+                }
+            }
         }
 
-        return $date;
+        return $date->setTimezone($this->getTimezone())->format($this->getInternalFormat());
     }
 
     public function getDisabledDates(): array
     {
         $dates = $this->evaluate($this->disabledDates);
-        $nepaliDates = array_map(function ($date) {
-            return $this->getNepaliFormatDate($date);
-        }, $dates);
+        $nepaliDates = array_map(fn ($date) => $this->getNepaliFormatDate($date), $dates);
 
         return $nepaliDates;
     }
@@ -138,12 +133,10 @@ class NepaliDatetimePicker extends DateTimePicker
         $defaultFocusedDate = $this->evaluate($this->bsDefaultFocusedDate);
 
         if (filled($defaultFocusedDate)) {
-            if ($defaultFocusedDate instanceof CarbonInterface) {
-                $defaultFocusedDate->setTimezone($this->getTimezone());
-            }
+            $defaultFocusedDate = $this->getNepaliFormatDate($defaultFocusedDate);
         }
 
-        return $this->getNepaliFormatDate($defaultFocusedDate);
+        return $defaultFocusedDate;
     }
 
     public function getDehydrateStateToNepali(): bool
@@ -155,9 +148,9 @@ class NepaliDatetimePicker extends DateTimePicker
     public function mutateDehydratedState(mixed $state): mixed
     {
         try {
-            $newState = NepaliDate::parse($state, $this->getFormat(), 'np')->locale('en')->format($this->getFormat());
-        } catch (\Throwable $e) {
-            $newState = $state;
+            $newState = NepaliDate::createFromFormat($this->getFormat(), $state)->locale('en')->format($this->getFormat());
+        } catch (\Throwable) {
+            $newState = null;
         }
 
         return parent::mutateDehydratedState($newState);

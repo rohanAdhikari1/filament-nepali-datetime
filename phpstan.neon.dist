@@ -3,3 +3,8 @@ parameters:
     paths:
         - src
         - config
+    excludePaths:
+        analyse:
+            - src/Concerns/HaveMacro.php
+            - src/Concerns/CanFormat.php
+            - src/FilamentNepaliDatetimeServiceProvider.php
