@@ -38,7 +38,7 @@ trait HaveMacro
                 if (blank($state)) {
                     return null;
                 }
-                $stateFormat = (string)$column->evaluate($stateFormat);
+                $stateFormat = (string) $column->evaluate($stateFormat);
                 $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
                 return $date
@@ -80,7 +80,7 @@ trait HaveMacro
                 if (blank($state)) {
                     return null;
                 }
-                $stateFormat = (string)$entry->evaluate($stateFormat);
+                $stateFormat = (string) $entry->evaluate($stateFormat);
                 $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
                 return $date
