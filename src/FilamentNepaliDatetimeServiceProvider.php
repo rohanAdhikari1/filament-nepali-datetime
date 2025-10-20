@@ -2,20 +2,17 @@
 
 namespace RohanAdhikari\FilamentNepaliDatetime;
 
+use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
-use RohanAdhikari\FilamentNepaliDatetime\Concerns\CanFormat;
-use RohanAdhikari\FilamentNepaliDatetime\Concerns\HaveMacro;
+use RohanAdhikari\FilamentNepaliDatetime\TextEntry\TextEntryMixin;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
 {
-    use CanFormat;
-    use HaveMacro;
-
     public static string $name = 'filament-nepali-datetime';
 
     public static string $viewNamespace = 'filament-nepali-datetime';
@@ -30,15 +27,8 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
         $package->name(static::$name)
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
-                    ->publishConfigFile()
                     ->askToStarRepoOnGitHub('rohanadhikari/filament-nepali-datetime');
             });
-
-        $configFileName = $package->shortName();
-
-        if (file_exists($package->basePath("/../config/{$configFileName}.php"))) {
-            $package->hasConfigFile();
-        }
 
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
@@ -49,8 +39,7 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
 
     public function bootingPackage()
     {
-        $this->registerTextColumnMacros();
-        $this->registerTextEntryMacros();
+        TextEntry::mixin(new TextEntryMixin, false);
     }
 
     public function packageBooted(): void
