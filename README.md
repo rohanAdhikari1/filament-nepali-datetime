@@ -38,7 +38,7 @@ composer require rohanadhikari/filament-nepali-datetime
 
 ## Usage
 
-To use `NepaliDate` in `NepaliDateTimePicker`, please refer to the documentation of [`NepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP).
+To use `NepaliDate`, please refer to the documentation of [`NepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP).
 
 ### 1. NepaliDateTimePicker
 
@@ -103,7 +103,7 @@ NepaliDatetimePicker::make('dob')
 
 ### Methods Supporting NepaliDate
 
-These methods support **NepaliDate**, **Carbon**, or **NepaliDate string** (`Y-m-d`):
+These methods support **NepaliDate**, **Carbon**, or **NepaliDate string**:
 
 | Method                 | Description                                                  | Example Usage                                          |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
