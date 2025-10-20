@@ -190,13 +190,23 @@ trait CanFormatStateInNepali
 
     public function nepaliNumber(): Closure
     {
-        return function (string | bool $currencySymbol = false, $only = false, string $locale = 'en', bool $format = true) {
-            $this->formatStateUsing(static function ($state) use ($currencySymbol, $only, $locale, $format): ?string {
+        return function (string | Closure | bool $currencySymbol = false, Closure | bool $only = false, string | Closure $locale = 'en', bool | Closure $format = true) {
+            $this->formatStateUsing(static function (TextEntry $component, $state) use ($currencySymbol, $only, $locale, $format): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliNumbers::getNepaliCurrency($state, $currencySymbol, $only, $format, $locale);
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                return NepaliNumbers::getNepaliCurrency(
+                    $state,
+                    $component->evaluate($currencySymbol),
+                    $component->evaluate($only),
+                    $component->evaluate($format),
+                    $component->evaluate($locale) ?? 'en'
+                );
             });
 
             return $this;
@@ -205,13 +215,162 @@ trait CanFormatStateInNepali
 
     public function nepaliWord(): Closure
     {
-        return function (bool $currency = false, $only = false, string $locale = 'en') {
-            $this->formatStateUsing(static function ($state) use ($currency, $only, $locale): ?string {
+        return function (bool | Closure $currency = false, bool | Closure $only = false, string | Closure $locale = 'en'): static {
+            $this->formatStateUsing(static function (TextEntry $component, $state) use ($currency, $only, $locale): ?string {
                 if (blank($state)) {
                     return null;
                 }
 
-                return NepaliNumbers::getNepaliWord($state, $currency, $locale, $only);
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                return NepaliNumbers::getNepaliWord($state, $component->evaluate($currency), $component->evaluate($locale) ?? 'en', $component->evaluate($only));
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliMoney(): Closure
+    {
+        return function (string | bool | Closure | null $currencySymbol = true, int | Closure $divideBy = 0, string | Closure | null $locale = null, bool | Closure $only = true): static {
+            $this->money();
+            $this->formatStateUsing(static function (TextEntry $component, $state) use ($currencySymbol, $divideBy, $locale, $only): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+                $currencySymbol = $component->evaluate($currencySymbol);
+                $only = $component->evaluate($only);
+                $locale = $component->evaluate($locale) ?? 'en';
+                if ($divideBy = $component->evaluate($divideBy) && (int) $state != 0) {
+                    $state /= $divideBy;
+                }
+
+                return NepaliNumbers::getNepaliCurrency($state, $currencySymbol, $only, true, $locale);
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliNumeric(): Closure
+    {
+        return function (string | Closure | null $locale = null): static {
+            $this->numeric();
+
+            $this->formatStateUsing(static function (TextEntry $component, $state) use ($locale): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                $locale = $component->evaluate($locale) ?? 'en';
+                $state = NepaliNumbers::nepaliNumberFormat($state);
+                if ($locale == 'en') {
+                    return $state;
+                }
+
+                return NepaliNumbers::convertToNepali($state);
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliNumberTooltip(): Closure
+    {
+        return function (string | Closure | bool $currencySymbol = false, Closure | bool $only = false, string | Closure $locale = 'en', bool | Closure $format = true) {
+            $this->tooltip(static function (TextEntry $component, $state) use ($currencySymbol, $only, $locale, $format): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                return NepaliNumbers::getNepaliCurrency(
+                    $state,
+                    $component->evaluate($currencySymbol),
+                    $component->evaluate($only),
+                    $component->evaluate($format),
+                    $component->evaluate($locale) ?? 'en'
+                );
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliWordTooltip(): Closure
+    {
+        return function (bool | Closure $currency = false, bool | Closure $only = false, string | Closure $locale = 'en'): static {
+            $this->tooltip(static function (TextEntry $component, $state) use ($currency, $only, $locale): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                return NepaliNumbers::getNepaliWord($state, $component->evaluate($currency), $component->evaluate($locale) ?? 'en', $component->evaluate($only));
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliMoneyTooltip(): Closure
+    {
+        return function (string | bool | Closure | null $currencySymbol = true, int | Closure $divideBy = 0, string | Closure | null $locale = null, bool | Closure $only = true): static {
+            $this->tooltip(static function (TextEntry $component, $state) use ($currencySymbol, $divideBy, $locale, $only): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+                $currencySymbol = $component->evaluate($currencySymbol);
+                $only = $component->evaluate($only);
+                $locale = $component->evaluate($locale) ?? 'en';
+                if ($divideBy = $component->evaluate($divideBy) && (int) $state != 0) {
+                    $state /= $divideBy;
+                }
+
+                return NepaliNumbers::getNepaliCurrency($state, $currencySymbol, $only, true, $locale);
+            });
+
+            return $this;
+        };
+    }
+
+    public function nepaliNumericTooltip(): Closure
+    {
+        return function (string | Closure | null $locale = null): static {
+            $this->tooltip(static function (TextEntry $component, $state) use ($locale): ?string {
+                if (blank($state)) {
+                    return null;
+                }
+
+                if (! is_numeric($state)) {
+                    return $state;
+                }
+
+                $locale = $component->evaluate($locale) ?? 'en';
+                $state = NepaliNumbers::nepaliNumberFormat($state);
+                if ($locale == 'en') {
+                    return $state;
+                }
+
+                return NepaliNumbers::convertToNepali($state);
             });
 
             return $this;

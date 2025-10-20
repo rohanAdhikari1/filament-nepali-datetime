@@ -6,6 +6,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Tables\Columns\TextColumn;
+use RohanAdhikari\FilamentNepaliDatetime\TextColumn\TextColumnMixin;
 use RohanAdhikari\FilamentNepaliDatetime\TextEntry\TextEntryMixin;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -40,6 +42,7 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
     public function bootingPackage()
     {
         TextEntry::mixin(new TextEntryMixin, false);
+        TextColumn::mixin(new TextColumnMixin, false);
     }
 
     public function packageBooted(): void
