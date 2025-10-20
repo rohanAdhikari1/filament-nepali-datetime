@@ -13,7 +13,7 @@ trait HaveMacro
 {
     public function registerTextColumnMacros(): void
     {
-        TextColumn::macro('toNepaliDate', function (string | Closure | null $format = null, string $locale = 'en', string | Closure | null $timezone = null) {
+        TextColumn::macro('toNepaliDate', function (string | Closure | null $format = null, string | Closure $locale = 'en', string | Closure | null $timezone = null) {
             /** @var TextColumn $this */
             $this->formatStateUsing(static function (TextColumn $column, $state) use ($format, $timezone, $locale): ?string {
                 if (blank($state)) {
@@ -21,7 +21,9 @@ trait HaveMacro
                 }
 
                 return NepaliDate::fromNotation($state, $timezone ?? $column->getTimezone())
-                    ->locale($locale)
+                    ->locale(
+                        $column->evaluate($locale)
+                    )
                     ->format(
                         $column->evaluate($format) ?? FilamentNepaliDatetimeServiceProvider::getDefaultFormat()
                     );
@@ -30,14 +32,14 @@ trait HaveMacro
             return $this;
         });
 
-        TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
+        TextColumn::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string | Closure $locale = 'en') {
             /** @var TextColumn $this */
             $this->formatStateUsing(static function (TextColumn $column, $state) use ($format, $locale, $stateFormat): ?string {
                 if (blank($state)) {
                     return null;
                 }
-                $stformat = (string)$column->evaluate($stateFormat);
-                $date = $stformat ? NepaliDate::createFromFormat($stformat, $state) : NepaliDate::parse($state);
+                $stateFormat = (string)$column->evaluate($stateFormat);
+                $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
                 return $date
                     ->locale(
@@ -72,14 +74,14 @@ trait HaveMacro
             return $this;
         });
 
-        TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string $locale = 'en') {
+        TextEntry::macro('nepaliDate', function (string | Closure | null $stateFormat = null, string | Closure | null $format = null, string | Closure $locale = 'en') {
             /** @var TextEntry $this */
             $this->formatStateUsing(static function (TextEntry $entry, $state) use ($format, $locale, $stateFormat): ?string {
                 if (blank($state)) {
                     return null;
                 }
-                $stformat = (string)$entry->evaluate($stateFormat);
-                $date = $stformat ? NepaliDate::createFromFormat($stformat, $state) : NepaliDate::parse($state);
+                $stateFormat = (string)$entry->evaluate($stateFormat);
+                $date = $stateFormat ? NepaliDate::createFromFormat($stateFormat, $state) : NepaliDate::parse($state);
 
                 return $date
                     ->locale($entry->evaluate($locale))

@@ -155,7 +155,7 @@ The DatePicker supports keyboard navigation for accessibility and ease of use.
 
 The following functions are available on TextColumn and/or TextEntry.
 
-#### `nepaliDate()`
+### `nepaliDate()`
 
 Format a stored BS date into English or Nepali locale. This function can be used in TextColumn and Text Entry both.
 
@@ -179,13 +179,13 @@ TextEntry::make('dob')
     );
 ```
 
-| Argument      | Type                        | Default        | Description            |
-| ------------- | --------------------------- | -------------- | ---------------------- |
-| `stateFormat` | `string \| Closure \| null` | `null`         | Format of stored date. |
-| `format`      | `string \| Closure \| null` | default format | Output format (BS).    |
-| `locale`      | `string ('en' or 'np')`     | `'en'`         | Locale to format date. |
+| Argument      | Type                              | Default        | Description            |
+| ------------- | --------------------------------- | -------------- | ---------------------- |
+| `stateFormat` | `string \| Closure \| null`       | `null`         | Format of stored date. |
+| `format`      | `string \| Closure \| null`       | default format | Output format (BS).    |
+| `locale`      | `string('en' or 'np') \| Closure` | `'en'`         | Locale to format date. |
 
-#### `toNepaliDate()`
+### `toNepaliDate()`
 
 Converts a stored AD date into BS date, then formats it. This function can be used in TextColumn and Text Entry both.
 
@@ -198,13 +198,13 @@ TextEntry::make('dob')
     ->toNepaliDate(format: 'd M, Y', locale: 'en');
 ```
 
-| Argument   | Type                        | Default               | Description                              |
-| ---------- | --------------------------- | --------------------- | ---------------------------------------- |
-| `format`   | `string \| Closure \| null` | default (from config) | Output format for BS date.               |
-| `locale`   | `string ('en' or 'np')`     | `'en'`                | Display language for formatted date.     |
-| `timezone` | `string \| Closure \| null` | `null`                | Timezone for parsing the stored AD date. |
+| Argument   | Type                              | Default               | Description                              |
+| ---------- | --------------------------------- | --------------------- | ---------------------------------------- |
+| `format`   | `string \| Closure \| null`       | default (from config) | Output format for BS date.               |
+| `locale`   | `string('en' or 'np') \| Closure` | `'en'`                | Display language for formatted date.     |
+| `timezone` | `string \| Closure \| null`       | `null`                | Timezone for parsing the stored AD date. |
 
-#### `nepaliNumber()`
+### `nepaliNumber()`
 
 Convert numbers into Nepali numerals or currency format.. This function can be used in TextEntry.
 
@@ -220,7 +220,7 @@ TextEntry::make('salary')
 | `locale`         | `string ('en'/'np')` | `'en'`  | Display locale.                                             |
 | `format`         | `bool`               | `true`  | Whether to apply number formatting (commas, etc).           |
 
-#### `nepaliWord()`
+### `nepaliWord()`
 
 This function used to convert numbers into Nepali Words optionally, currency words also. This function can be used in TextEntry.
 
