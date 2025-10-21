@@ -8,6 +8,7 @@ export default function dateTimePickerFormComponent({
     isAutofocused,
     locale,
     shouldCloseOnDateSelection,
+    disableNavWhenOutOfRange,
     state,
 }) {
     return {
@@ -26,6 +27,10 @@ export default function dateTimePickerFormComponent({
         hour: null,
 
         isClearingState: false,
+
+        isPrevActive: true,
+
+        isNextActive: true,
 
         minute: null,
 
@@ -54,12 +59,7 @@ export default function dateTimePickerFormComponent({
                 this.getDefaultFocusedDate() ??
                 nepalidayjs()
 
-            if (this.getMaxDate() !== null && date.isAfter(this.getMaxDate())) {
-                date = null
-            } else if (
-                this.getMinDate() !== null &&
-                date.isBefore(this.getMinDate())
-            ) {
+            if (!this.dateIsInRange(date)) {
                 date = null
             }
 
@@ -124,6 +124,9 @@ export default function dateTimePickerFormComponent({
                     this.focusedYear = year
                 }
 
+                if (disableNavWhenOutOfRange) {
+                    this.checkDateRange()
+                }
                 this.setupDaysGrid()
             })
 
@@ -206,16 +209,7 @@ export default function dateTimePickerFormComponent({
                     return
                 }
 
-                if (
-                    this.getMaxDate() !== null &&
-                    date?.isAfter(this.getMaxDate())
-                ) {
-                    date = null
-                }
-                if (
-                    this.getMinDate() !== null &&
-                    date?.isBefore(this.getMinDate())
-                ) {
+                if (!this.dateIsInRange(date)) {
                     date = null
                 }
 
@@ -281,6 +275,22 @@ export default function dateTimePickerFormComponent({
             return false
         },
 
+        dateIsInRange(date) {
+            if (
+                this.getMaxDate() !== null &&
+                date?.isAfter(this.getMaxDate())
+            ) {
+                return false
+            }
+            if (
+                this.getMinDate() !== null &&
+                date?.isBefore(this.getMinDate())
+            ) {
+                return false
+            }
+            return true
+        },
+
         dayIsDisabled(day) {
             this.focusedDate ??= nepalidayjs()
 
@@ -316,59 +326,126 @@ export default function dateTimePickerFormComponent({
 
         focusPreviousDay() {
             this.focusedDate ??= nepalidayjs()
-
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.subtract(1, 'day'))
+            ) {
+                return
+            }
             this.focusedDate.subDay()
         },
 
         focusPreviousWeek() {
             this.focusedDate ??= nepalidayjs()
-
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.subtract(1, 'week'))
+            ) {
+                return
+            }
             this.focusedDate.subWeek()
         },
 
         focusPreviousMonth() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.subtract(1, 'month'))
+            ) {
+                return
+            }
 
             this.focusedDate.subMonth()
         },
 
         focusPreviousYear() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.subtract(1, 'year'))
+            ) {
+                return
+            }
 
             this.focusedDate.subYear()
         },
 
         focusNextDay() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.add(1, 'day'))
+            ) {
+                return
+            }
 
             this.focusedDate.addDay()
         },
 
         focusNextWeek() {
             this.focusedDate ??= nepalidayjs()
-
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.add(1, 'week'))
+            ) {
+                return
+            }
             this.focusedDate.addWeek()
         },
 
         focusNextMonth() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.add(1, 'month'))
+            ) {
+                return
+            }
 
             this.focusedDate.addMonth()
         },
 
         focusNextYear() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(this.focusedDate.add(1, 'year'))
+            ) {
+                return
+            }
 
             this.focusedDate.addYear()
         },
 
         focusStartOfWeek() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(
+                    this.focusedDate.subtract(
+                        this.focusedDate.dayOfWeek() - 1,
+                        'week',
+                    ),
+                )
+            ) {
+                return
+            }
 
             this.focusedDate.subDays(this.focusedDate.dayOfWeek() - 1)
         },
         focusEndOfWeek() {
             this.focusedDate ??= nepalidayjs()
+            if (
+                disableNavWhenOutOfRange &&
+                !this.dateIsInRange(
+                    this.focusedDate.add(
+                        7 - this.focusedDate.dayOfWeek(),
+                        'week',
+                    ),
+                )
+            ) {
+                return
+            }
 
             this.focusedDate.addDays(7 - this.focusedDate.dayOfWeek())
         },
@@ -480,6 +557,19 @@ export default function dateTimePickerFormComponent({
 
         setDayLabels() {
             this.dayLabels = this.getDayLabels()
+        },
+
+        checkDateRange() {
+            let nextMonthDate = this.focusedDate.add(1, 'month'),
+                prevMonthDate = this.focusedDate.subtract(1, 'month')
+            this.isNextActive = true
+            this.isPrevActive = true
+            if (!this.dateIsInRange(nextMonthDate)) {
+                this.isNextActive = false
+            }
+            if (!this.dateIsInRange(prevMonthDate)) {
+                this.isPrevActive = false
+            }
         },
 
         setupDaysGrid() {

@@ -63,7 +63,7 @@ trait CanFormatStateInNepali
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
             $this->dateTime();
 
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
 
             return $this->nepaliDate($format, $timezone, $locale);
         };
@@ -74,7 +74,7 @@ trait CanFormatStateInNepali
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
             $this->dateTime();
 
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
 
             return $this->toNepaliDate($format, $timezone, $locale);
         };
@@ -85,7 +85,7 @@ trait CanFormatStateInNepali
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
             $this->time();
 
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
 
             return $this->nepaliDate($format, $timezone, $locale);
         };
@@ -96,7 +96,7 @@ trait CanFormatStateInNepali
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
             $this->time();
 
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
 
             return $this->toNepaliDate($format, $timezone, $locale);
         };
@@ -152,7 +152,7 @@ trait CanFormatStateInNepali
     public function nepaliDateTimeTooltip(): Closure
     {
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultDateTimeDisplayFormat();
 
             return $this->nepaliDateTooltip($format, $timezone, $locale);
         };
@@ -161,7 +161,7 @@ trait CanFormatStateInNepali
     public function timeTooltip(): Closure
     {
         return function (string | Closure | null $format = null, string | Closure | null $timezone = null, string | Closure | null $locale = null): static {
-            $format ??= fn(TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
+            $format ??= fn (TextEntry $component): string => $component->getContainer()->getDefaultTimeDisplayFormat();
 
             return $this->nepaliDateTooltip($format, $timezone, $locale);
         };

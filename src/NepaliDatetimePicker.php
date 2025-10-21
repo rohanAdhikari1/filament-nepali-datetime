@@ -22,6 +22,8 @@ class NepaliDatetimePicker extends DateTimePicker
 
     protected bool | Closure $dehydrateStateInNepali = false;
 
+    protected bool | Closure $disableNavWhenOutOfRange = true;
+
     /**
      * @return array<StateCast>
      */
@@ -40,6 +42,13 @@ class NepaliDatetimePicker extends DateTimePicker
     public function dehydrateStateInNepali(Closure | bool $condition = true): static
     {
         $this->dehydrateStateInNepali = $condition;
+
+        return $this;
+    }
+
+    public function disableNavWhenOutOfRange(Closure | bool $condition = true): static
+    {
+        $this->disableNavWhenOutOfRange = $condition;
 
         return $this;
     }
@@ -71,7 +80,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMaxDate = $date;
 
-        $this->rule(static fn (NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
+        $this->rule(static fn(NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
 
         return $this;
     }
@@ -80,7 +89,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMinDate = $date;
 
-        $this->rule(static fn (NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
+        $this->rule(static fn(NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
 
         return $this;
     }
@@ -123,7 +132,7 @@ class NepaliDatetimePicker extends DateTimePicker
     public function getDisabledDates(): array
     {
         $dates = $this->evaluate($this->disabledDates);
-        $nepaliDates = array_map(fn ($date) => $this->getNepaliFormatDate($date), $dates);
+        $nepaliDates = array_map(fn($date) => $this->getNepaliFormatDate($date), $dates);
 
         return $nepaliDates;
     }
@@ -141,8 +150,12 @@ class NepaliDatetimePicker extends DateTimePicker
 
     public function getDehydrateStateToNepali(): bool
     {
-
         return $this->evaluate($this->dehydrateStateInNepali);
+    }
+
+    public function getDisableNavWhenOutOfRange(): bool
+    {
+        return $this->evaluate($this->disableNavWhenOutOfRange);
     }
 
     public function mutateDehydratedState(mixed $state): mixed

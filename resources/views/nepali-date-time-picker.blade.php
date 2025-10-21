@@ -47,6 +47,7 @@
                 isAutofocused: @js($isAutofocused),
                 locale: @js($getLocale()),
                 shouldCloseOnDateSelection: @js($shouldCloseOnDateSelection()),
+                disableNavWhenOutOfRange: @js($getDisableNavWhenOutOfRange()),
                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             })" wire:ignore
             wire:key="{{ $livewireKey }}.{{ substr(
@@ -96,7 +97,7 @@
                 wire:key="{{ $livewireKey }}.panel" @class(['fi-fo-date-time-picker-panel'])>
                 @if ($hasDate)
                     <div class="fi-fo-date-time-picker-panel-header">
-                        <button type="button" x-on:click="focusPreviousMonth()">
+                        <button x-show="isPrevActive" x-cloak type="button" x-on:click="focusPreviousMonth()">
                             <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -116,7 +117,7 @@
                             </template>
                         </select>
 
-                        <button type="button" x-on:click="focusNextMonth()">
+                        <button x-show="isNextActive" x-cloak type="button" x-on:click="focusNextMonth()">
                             <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
