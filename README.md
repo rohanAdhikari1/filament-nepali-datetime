@@ -88,6 +88,19 @@ NepaliDatePicker::make('dob')
     ->weekStartsOnSaturday()
 ```
 
+---
+
+### Disable Navigation When Out Of Range
+
+By Default, Navigation is disabled when date is out of range(like after maxdate or before mindate). To enable navigation even Date is Out of Range You can use `->disableNavWhenOutOfRange(false)`.
+
+```php
+NepaliDatePicker::make('dob')
+    ->disableNavWhenOutOfRange(false)
+```
+
+---
+
 ### Saving Date in Nepali Format
 
 By Default, Datetime is saved in english format even locale is 'np'. You can configure it to save in **Nepali Unicode** in the database.
