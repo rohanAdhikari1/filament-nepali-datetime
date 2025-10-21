@@ -157,7 +157,7 @@ The DatePicker supports keyboard navigation for accessibility and ease of use.
 
 ### 2. Nepali Functions
 
-The following functions are available on TextColumn and/or Nepali date, time, currency and number formats.
+The following functions are available on TextColumn and TextEntry.
 
 ### `nepaliDate()`
 
@@ -190,6 +190,8 @@ TextEntry::make('dob')
 | `timezone` | `string \| Closure \| null`       | `null`                 | Timezone for displaying date.         |
 | `locale`   | `string('en' or 'np') \| Closure` | `'en'`                 | Language/locale for formatted output. |
 
+---
+
 ### `toNepaliDate()`
 
 Converts a stored AD date into BS date, then formats it.
@@ -201,6 +203,11 @@ TextColumn::make('dob')
 // Infolist Text Entry
 TextEntry::make('dob')
     ->toNepaliDate(format: 'd M, Y', locale: 'en');
+    //also
+TextColumn::make('dob')
+    ->toNepaliDateTime(locale: 'np');
+TextEntry::make('dob')
+    ->toNepaliTime(locale: 'en');
 ```
 
 | Argument   | Type                              | Default                | Description                           |
@@ -229,25 +236,25 @@ TextColumn::make('published_at')
 
 ### `nepaliNumber()`
 
-Convert numbers into Nepali numerals or currency format.. This function can be used in TextEntry.
+Converts numbers into Nepali numerals or formatted currency representations.
 
 ```php
 TextEntry::make('salary')
     ->nepaliNumber(currencySymbol: true, locale: 'np');
 ```
 
-| Argument         | Type                        | Default | Description                                 |
-| ---------------- | --------------------------- | ------- | ------------------------------------------- |
-| `currencySymbol` | `bool \| Closure \| string` | `false` | Display currency symbol (e.g., रू).         |
-| `only`           | `bool \| Closure`           | `false` | Append “Only” at the end.                   |
-| `locale`         | `'en' \| 'np' \| Closure`   | `'en'`  | Locale for numeral display.                 |
-| `format`         | `bool \| Closure`           | `true`  | Whether to apply formatting (commas, etc.). |
+| Argument         | Type                        | Default | Description                                        |
+| ---------------- | --------------------------- | ------- | -------------------------------------------------- |
+| `currencySymbol` | `bool \| Closure \| string` | `false` | Displays the currency symbol (e.g., रू).           |
+| `only`           | `bool \| Closure`           | `false` | Appends “Only” to the end of the formatted number. |
+| `locale`         | `'en' \| 'np' \| Closure`   | `'en'`  | Output locale for numerals.                        |
+| `format`         | `bool \| Closure`           | `true`  | Whether to apply number formatting (commas, etc.). |
 
 ---
 
 ### `nepaliWord()`
 
-This function used to convert numbers into Nepali Words optionally, currency words also. This function can be used in TextEntry.
+Converts numeric values into Nepali or English words, optionally as currency words.
 
 ```php
 TextEntry::make('amount')
@@ -264,7 +271,7 @@ TextEntry::make('amount')
 
 ### `nepaliMoney()`
 
-Formats numeric values as Nepali currency.
+Formats numeric values as Nepali currency, complete with symbols, localization, and optional unit division.
 
 ```php
 TextEntry::make('total')
@@ -297,7 +304,18 @@ TextEntry::make('population')
 
 ### NepaliFunctions for Tooltip
 
-Just append the Tooltip at end for all NepaliFunction to get tooltip Exmaple for `nepaliSince()` use `nepaliSinceTooltip`.
+You can append Tooltip to any Nepali function to display formatted tooltips.
+
+```php
+TextColumn::make('created_at')->nepaliSinceTooltip();
+
+```
+
+**For example:**
+
+-   `nepaliDate()` → `nepaliDateTooltip()`
+-   `nepaliSince()` → `nepaliSinceTooltip()`
+-   `nepaliMoney()` → `nepaliMoneyTooltip()`
 
 ---
 
