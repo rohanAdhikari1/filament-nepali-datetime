@@ -31,6 +31,7 @@
     $step = $getStep();
     $type = $getType();
     $livewireKey = $getLivewireKey();
+    $is12HourFormat = $getIs12HourFormat();
 @endphp
 <x-dynamic-component :component="$fieldWrapperView" :field="$field" :inline-label-vertical-alignment="\Filament\Support\Enums\VerticalAlignment::Center">
     <x-filament::input.wrapper :disabled="$isDisabled" :inline-prefix="$isPrefixInline" :inline-suffix="$isSuffixInline" :prefix="$prefixLabel" :prefix-actions="$prefixActions"
@@ -48,6 +49,7 @@
                 locale: @js($getLocale()),
                 shouldCloseOnDateSelection: @js($shouldCloseOnDateSelection()),
                 disableNavWhenOutOfRange: @js($getDisableNavWhenOutOfRange()),
+                is12HourFormat: @js($is12HourFormat),
                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             })" wire:ignore
             wire:key="{{ $livewireKey }}.{{ substr(
@@ -155,8 +157,8 @@
 
                 @if ($hasTime)
                     <div class="fi-fo-date-time-picker-time-inputs">
-                        <input max="23" min="0" step="{{ $getHoursStep() }}" type="number"
-                            inputmode="numeric" x-model.debounce="hour" />
+                        <input max="{{ $is12HourFormat ? '12' : '24' }}" min="0" step="{{ $getHoursStep() }}"
+                            type="number" inputmode="numeric" x-model.debounce="hour" />
 
                         <span class="fi-fo-date-time-picker-time-input-separator">
                             :
@@ -172,6 +174,13 @@
 
                             <input max="59" min="0" step="{{ $getSecondsStep() }}" type="number"
                                 inputmode="numeric" x-model.debounce="second" />
+                        @endif
+
+                        @if ($is12HourFormat)
+                            <select x-model="meridian" class="fi-fo-date-time-picker-month-select">
+                                <option value="am">AM</option>
+                                <option value="pm">PM</option>
+                            </select>
                         @endif
                     </div>
                 @endif

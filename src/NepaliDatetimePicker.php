@@ -24,6 +24,8 @@ class NepaliDatetimePicker extends DateTimePicker
 
     protected bool | Closure $disableNavWhenOutOfRange = true;
 
+    protected bool $useTime12HourFormat = false;
+
     /**
      * @return array<StateCast>
      */
@@ -37,6 +39,25 @@ class NepaliDatetimePicker extends DateTimePicker
                 'timezone' => $this->getTimezone(),
             ]),
         ];
+    }
+
+    public function use24Hour(): static
+    {
+        return $this->use12Hour(false);
+    }
+
+    public function use12Hour(bool | Closure $condition = true): static
+    {
+        $condition = $this->evaluate($condition);
+        if ($condition) {
+            $this->defaultDateTimeDisplayFormat('M j, Y h:i A');
+            $this->defaultDateTimeWithSecondsDisplayFormat('M j, Y h:i:s A');
+            $this->defaultTimeDisplayFormat('h:i A');
+            $this->defaultTimeWithSecondsDisplayFormat('h:i:s A');
+        }
+        $this->useTime12HourFormat = $condition;
+
+        return $this;
     }
 
     public function dehydrateStateInNepali(Closure | bool $condition = true): static
@@ -80,7 +101,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMaxDate = $date;
 
-        $this->rule(static fn(NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
+        $this->rule(static fn (NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
 
         return $this;
     }
@@ -89,7 +110,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMinDate = $date;
 
-        $this->rule(static fn(NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
+        $this->rule(static fn (NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
 
         return $this;
     }
@@ -132,7 +153,7 @@ class NepaliDatetimePicker extends DateTimePicker
     public function getDisabledDates(): array
     {
         $dates = $this->evaluate($this->disabledDates);
-        $nepaliDates = array_map(fn($date) => $this->getNepaliFormatDate($date), $dates);
+        $nepaliDates = array_map(fn ($date) => $this->getNepaliFormatDate($date), $dates);
 
         return $nepaliDates;
     }
@@ -156,6 +177,11 @@ class NepaliDatetimePicker extends DateTimePicker
     public function getDisableNavWhenOutOfRange(): bool
     {
         return $this->evaluate($this->disableNavWhenOutOfRange);
+    }
+
+    public function getIs12HourFormat(): bool
+    {
+        return $this->useTime12HourFormat;
     }
 
     public function mutateDehydratedState(mixed $state): mixed
