@@ -101,7 +101,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMaxDate = $date;
 
-        $this->rule(static fn (NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
+        $this->rule(static fn(NepaliDatetimePicker $component) => "before_or_equal:{$component->getMaxDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMaxDate());
 
         return $this;
     }
@@ -110,7 +110,7 @@ class NepaliDatetimePicker extends DateTimePicker
     {
         $this->bsMinDate = $date;
 
-        $this->rule(static fn (NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn (NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
+        $this->rule(static fn(NepaliDatetimePicker $component) => "after_or_equal:{$component->getMinDate()}", static fn(NepaliDatetimePicker $component): bool => (bool) $component->getMinDate());
 
         return $this;
     }
@@ -153,7 +153,7 @@ class NepaliDatetimePicker extends DateTimePicker
     public function getDisabledDates(): array
     {
         $dates = $this->evaluate($this->disabledDates);
-        $nepaliDates = array_map(fn ($date) => $this->getNepaliFormatDate($date), $dates);
+        $nepaliDates = array_map(fn($date) => $this->getNepaliFormatDate($date), $dates);
 
         return $nepaliDates;
     }

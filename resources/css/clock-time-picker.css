@@ -1,0 +1,103 @@
+.fi-fo-nepali-clock-time-picker {
+    & .fi-fo-nepali-clock-time-picker-trigger {
+        @apply w-full;
+    }
+
+    & .fi-fo-nepali-clock-time-picker-display-text-input {
+        @apply w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:var(--color-gray-500)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:var(--color-gray-400)];
+    }
+
+    & .fi-fo-nepali-clock-time-picker-panel {
+        @apply absolute z-10 space-y-3 rounded-lg bg-white p-4 shadow-lg ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+
+        & .fi-fo-nepali-clock-time-picker-panel-header {
+            @apply flex items-center justify-center;
+
+            & .fi-fo-nepali-clock-time-picker-panel-header-divider {
+                @apply p-1;
+            }
+
+            & .fi-fo-nepali-clock-time-picker-panel-header-tag {
+                @apply rounded-md p-2;
+
+                &.fi-disabled {
+                    @apply pointer-events-none opacity-50;
+                }
+
+                &:not(.fi-disabled) {
+                    @apply cursor-pointer bg-gray-100 dark:bg-white/10;
+                }
+
+                &.fi-selected {
+                    @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                }
+
+            }
+
+            & .fi-fo-nepali-clock-time-picker-panel-header-tag-off {
+                @apply text-xs ms-2 rounded-md p-1 bg-gray-100 dark:bg-white/10;
+            }
+        }
+    }
+
+    & .fi-fo-nepali-clock-time-picker-clock-wrapper {
+        & .fi-fo-nepali-clock-time-picker-clock {
+            @apply w-48 h-48 flex justify-center items-center relative rounded-full border border-gray-950/5 dark:border-white/10;
+
+            & .fi-fo-nepali-clock-time-picker-clock-tag {
+                @apply absolute select-none p-1 rounded-full z-20 cursor-pointer;
+                aspect-ratio: 1 / 1;
+
+                &.fi-disabled {
+                    @apply pointer-events-none opacity-50;
+                }
+
+                &.fi-selected {
+                    @apply text-sm pointer-events-none bg-gray-950/5 dark:bg-white/10;
+                }
+
+                /* 
+                &.fi-focused:not(.fi-selected):not(.fi-disabled) {
+                    @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                } */
+            }
+        }
+
+        & .fi-fo-nepali-clock-time-picker-clock-meridian {
+            @apply flex justify-between;
+
+            & .fi-fo-nepali-clock-time-picker-clock-meridian-tag {
+                @apply rounded-full p-2;
+
+                &.fi-disabled {
+                    @apply pointer-events-none opacity-50;
+                }
+
+                &:not(.fi-disabled) {
+                    @apply cursor-pointer bg-gray-100 dark:bg-white/10;
+                }
+
+                &.fi-selected {
+                    @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                }
+            }
+        }
+
+        & .fi-fo-nepali-clock-time-picker-clock-hand {
+            @apply cursor-move absolute top-1/2 left-1/2 origin-bottom bg-primary-600 dark:bg-primary-400 z-10 w-[2px] h-[33%];
+            transform: translate(-50%, -100%) rotate(0deg);
+            transition: transform 0.3s ease-in-out;
+
+            & .fi-fo-nepali-clock-time-picker-hand-indicator {
+                @apply absolute top-0 left-1/2 bg-primary-600 dark:bg-primary-400 rounded-full w-6 h-6 shadow-2xl backdrop-blur-md;
+                transform: translate(-50%, -100%);
+                transition: all 0.3s ease;
+            }
+        }
+
+        & .fi-fo-nepali-clock-time-picker-clock-center-dot {
+            @apply absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-primary-600 dark:bg-primary-400 z-10;
+            transform: translate(-50%, -50%);
+        }
+    }
+}
