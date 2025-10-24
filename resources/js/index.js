@@ -9,6 +9,7 @@ export default function dateTimePickerFormComponent({
     locale,
     shouldCloseOnDateSelection,
     disableNavWhenOutOfRange,
+    is12HourFormat,
     state,
 }) {
     return {
@@ -35,6 +36,8 @@ export default function dateTimePickerFormComponent({
         minute: null,
 
         second: null,
+
+        meridian: null,
 
         state,
 
@@ -66,6 +69,16 @@ export default function dateTimePickerFormComponent({
             this.hour = date?.hour() ?? 0
             this.minute = date?.minute() ?? 0
             this.second = date?.second() ?? 0
+
+            if (is12HourFormat) {
+                if (this.hour >= 12) {
+                    this.meridian = 'pm'
+                    if (this.hour > 12) this.hour -= 12
+                } else {
+                    this.meridian = 'am'
+                    this.hour = this.hour === 0 ? 1 : this.hour
+                }
+            }
 
             this.setDisplayText()
             this.setMonths()
@@ -134,22 +147,26 @@ export default function dateTimePickerFormComponent({
                 let hour = +this.hour
 
                 if (!Number.isInteger(hour)) {
+                    this.hour = is12HourFormat ? 1 : 0
+                } else if (is12HourFormat && (hour > 12 || hour < 1)) {
+                    this.hour = 1
+                } else if (!is12HourFormat && (hour > 23 || hour < 0)) {
                     this.hour = 0
-                } else if (hour > 23) {
-                    this.hour = 0
-                } else if (hour < 0) {
-                    this.hour = 23
-                } else {
-                    this.hour = hour
                 }
 
-                if (this.isClearingState) {
-                    return
-                }
+                if (this.isClearingState) return
 
                 let date = this.getSelectedDate() ?? this.focusedDate
 
-                this.setState(date.hour(this.hour ?? 0))
+                let adjustedHour = this.hour
+                if (is12HourFormat) {
+                    if (this.meridian === 'pm' && adjustedHour !== 12)
+                        adjustedHour += 12
+                    if (this.meridian === 'am' && adjustedHour === 12)
+                        adjustedHour = 0
+                }
+
+                this.setState(date.hour(adjustedHour))
             })
 
             this.$watch('minute', () => {
@@ -196,6 +213,16 @@ export default function dateTimePickerFormComponent({
                 this.setState(date.second(this.second ?? 0))
             })
 
+            this.$watch('meridian', () => {
+                if (!is12HourFormat || this.isClearingState) return
+                let adjustedHour = this.hour
+                if (this.meridian === 'pm' && adjustedHour !== 12)
+                    adjustedHour += 12
+                if (this.meridian === 'am' && adjustedHour === 12)
+                    adjustedHour = 0
+                this.setState(date.hour(adjustedHour))
+            })
+
             this.$watch('state', () => {
                 if (this.state === undefined) {
                     return
@@ -213,9 +240,12 @@ export default function dateTimePickerFormComponent({
                     date = null
                 }
 
-                const newHour = date?.hour() ?? 0
-                if (this.hour !== newHour) {
-                    this.hour = newHour
+                const newHour24 = date?.hour() ?? 0
+                if (is12HourFormat) {
+                    this.meridian = newHour24 >= 12 ? 'pm' : 'am'
+                    this.hour = newHour24 % 12 || 1
+                } else if (this.hour !== newHour24) {
+                    this.hour = newHour24
                 }
 
                 const newMinute = date?.minute() ?? 0
@@ -241,10 +271,10 @@ export default function dateTimePickerFormComponent({
 
             this.setState(null)
 
-            this.hour = 0
+            this.hour = is12HourFormat ? 1 : 0
             this.minute = 0
             this.second = 0
-
+            if (is12HourFormat) this.meridian = 'am'
             this.$nextTick(() => (this.isClearingState = false))
         },
 
@@ -606,8 +636,16 @@ export default function dateTimePickerFormComponent({
                 return
             }
 
+            let adjustedHour = this.hour ?? 0
+            if (is12HourFormat) {
+                if (this.meridian === 'pm' && adjustedHour !== 12)
+                    adjustedHour += 12
+                if (this.meridian === 'am' && adjustedHour === 12)
+                    adjustedHour = 0
+            }
+
             this.state = date
-                .hour(this.hour ?? 0)
+                .hour(adjustedHour)
                 .minute(this.minute ?? 0)
                 .second(this.second ?? 0)
                 .format('YYYY-MM-DD HH:mm:ss')
