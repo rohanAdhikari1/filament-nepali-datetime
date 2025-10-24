@@ -153,6 +153,15 @@ export default function clockTimePickerFormComponent({
             }
         },
 
+        focusFirstView() {
+            this.resetView()
+        },
+
+        focusLastView() {
+            let view = hasSeconds ? 'second' : 'minute'
+            this.setView(view)
+        },
+
         isTimeDisabled(timeArray) {
             if (!timeArray) return true
             if (
@@ -393,7 +402,7 @@ export default function clockTimePickerFormComponent({
         },
 
         resetView() {
-            this.view = defaultView ?? 'hour'
+            this.setView(defaultView ?? 'hour')
         },
 
         setState(date) {

@@ -66,7 +66,12 @@
                 x-on:keydown.arrow-right.prevent.stop="if (! $el.disabled) focusNext()"
                 x-on:keydown.page-up.prevent.stop="if (! $el.disabled) focusPrevView()"
                 x-on:keydown.page-down.prevent.stop="if (! $el.disabled) focusNextView()"
-                aria-label="{{ $placeholder }}" type="button" tabindex="-1" @disabled($isDisabled || $isReadOnly)
+                x-on:keydown.home.prevent.stop="if (! $el.disabled) focusFirstView()"
+                x-on:keydown.end.prevent.stop="if (! $el.disabled) focusLastView()"
+                x-on:keydown.backspace.prevent.stop="if (! $el.disabled) clearState()"
+                x-on:keydown.clear.prevent.stop="if (! $el.disabled) clearState()"
+                x-on:keydown.delete.prevent.stop="if (! $el.disabled) clearState()" aria-label="{{ $placeholder }}"
+                type="button" tabindex="-1" @disabled($isDisabled || $isReadOnly)
                 {{ $getExtraTriggerAttributeBag()->class(['fi-fo-nepali-clock-time-picker-trigger']) }}>
                 <input x-ref="displaytext" @disabled($isDisabled) readonly placeholder="{{ $placeholder }}"
                     wire:key="{{ $livewireKey }}.display-text" x-model="displayText"
