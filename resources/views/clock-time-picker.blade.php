@@ -111,7 +111,7 @@
                         <div x-show="view === 'hour'" x-transition:enter.duration.500ms
                             x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
                             x-cloak>
-                            <template x-for="h in shortHours" x-bind:key="h">
+                            <template x-for="h in getLength(12, 1)" x-bind:key="h">
                                 <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(h, 12)"
                                     x-text="toNumber(h)" x-on:click="selectHour(h)" x-bind:aria-selected="h === hour"
                                     x-bind:class="{
@@ -125,7 +125,7 @@
                         <div x-show="view === 'minute'" x-transition:enter.duration.500ms
                             x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
                             x-cloak>
-                            <template x-for="m in minutes" x-bind:key="m">
+                            <template x-for="m in getLength(60, 0)" x-bind:key="m">
                                 <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(m, 60)"
                                     x-text="m%5?'':toNumber(m)" x-on:click="selectMinute(m)"
                                     x-bind:aria-selected="m === minute"
@@ -140,7 +140,7 @@
                         <div x-show="view === 'second'" x-transition:enter.duration.500ms
                             x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
                             x-cloak>
-                            <template x-for="s in seconds" x-bind:key="s">
+                            <template x-for="s in getLength(60, 0)" x-bind:key="s">
                                 <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(s, 60)"
                                     x-text="s%5?'':toNumber(s)" x-on:click="selectSecond(s)"
                                     x-bind:aria-selected="s === second"

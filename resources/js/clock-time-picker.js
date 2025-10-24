@@ -27,14 +27,6 @@ export default function clockTimePickerFormComponent({
 
         state,
 
-        shortHours: [],
-
-        hours: [],
-
-        minutes: [],
-
-        seconds: [],
-
         handangle: 0,
 
         init() {
@@ -116,16 +108,50 @@ export default function clockTimePickerFormComponent({
             let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90
             if (angle < 0) angle += 360
             const step = 360 / this.getCurrentUnitMax()
-            let unitvalue = Math.round(angle / step)
-            this.setCurrentUnitValue(unitvalue)
+            let unitValue = Math.round(angle / step) % this.getCurrentUnitMax()
+            const unit = this.view
+            const candidate = [...this.getSelectedTimeArray()]
+            if (unit === 'hour') candidate[0] = unitValue
+            if (unit === 'minute') candidate[1] = unitValue
+            if (unit === 'second') candidate[2] = unitValue
+
+            if (!this.isTimeDisabled(candidate)) {
+                this.setCurrentUnitValue(unitValue)
+            }
+        },
+
+        findNextEnabled(unit, direction = 1) {
+            const max = this.getCurrentUnitMax()
+            let value = this.getCurrentUnitValue()
+            for (let i = 0; i < max; i++) {
+                value = (value + direction + max) % max
+                const testTime = [...this.getSelectedTimeArray()]
+                if (unit === 'hour') {
+                    const meridian = this.meridian?.toUpperCase()
+                    let hour24 = value
+                    if (meridian === 'AM' && value === 12) hour24 = 0
+                    if (meridian === 'PM' && value !== 12) hour24 = value + 12
+                    testTime[0] = hour24
+                } else if (unit === 'minute') {
+                    testTime[1] = value
+                } else if (unit === 'second') {
+                    testTime[2] = value
+                }
+                if (!this.isTimeDisabled(testTime)) return value
+            }
+            return this.getCurrentUnitValue()
         },
 
         focusNext() {
-            this.setCurrentUnitValue(this.getCurrentUnitValue() + 1)
+            const unit = this.view
+            const nextValue = this.findNextEnabled(unit, 1)
+            this.setCurrentUnitValue(nextValue)
         },
 
         focusPrev() {
-            this.setCurrentUnitValue(this.getCurrentUnitValue() - 1)
+            const unit = this.view
+            const prevValue = this.findNextEnabled(unit, -1)
+            this.setCurrentUnitValue(prevValue)
         },
 
         focusNextView(select = false) {
@@ -164,6 +190,7 @@ export default function clockTimePickerFormComponent({
 
         isTimeDisabled(timeArray) {
             if (!timeArray) return true
+            const timeSeconds = this.timeArrayToSeconds(timeArray)
             if (
                 this.$refs?.disabledTimes &&
                 JSON.parse(this.$refs.disabledTimes.value ?? []).some(
@@ -177,13 +204,6 @@ export default function clockTimePickerFormComponent({
             ) {
                 return true
             }
-            if (this.disabledTimes?.length) {
-                for (let disabled of this.disabledTimes) {
-                    const disabledSeconds = this.timeArrayToSeconds(disabled)
-                    if (timeSeconds === disabledSeconds) return true
-                }
-            }
-            const timeSeconds = this.timeArrayToSeconds(timeArray)
             const minTimeArray = this.getMinTime()
             if (minTimeArray) {
                 const minSeconds = this.timeArrayToSeconds(minTimeArray)
@@ -199,15 +219,23 @@ export default function clockTimePickerFormComponent({
         },
 
         hourDisabled(hour) {
+            if (this.meridian?.toUpperCase() === 'PM' && hour !== 12) hour += 12
+            if (this.meridian?.toUpperCase() === 'AM' && hour === 12) hour = 0
             return this.isTimeDisabled([hour, this.minute, this.second])
         },
 
         minuteDisabled(minute) {
-            return this.isTimeDisabled([this.hour, minute, this.second])
+            let hour = this.hour
+            if (this.meridian?.toUpperCase() === 'PM' && hour !== 12) hour += 12
+            if (this.meridian?.toUpperCase() === 'AM' && hour === 12) hour = 0
+            return this.isTimeDisabled([hour, minute, this.second])
         },
 
         secondDisabled(second) {
-            return this.isTimeDisabled([this.hour, this.minute, second])
+            let hour = this.hour
+            if (this.meridian?.toUpperCase() === 'PM' && hour !== 12) hour += 12
+            if (this.meridian?.toUpperCase() === 'AM' && hour === 12) hour = 0
+            return this.isTimeDisabled([hour, this.minute, second])
         },
 
         getMaxTime() {
@@ -268,7 +296,7 @@ export default function clockTimePickerFormComponent({
         },
         togglePanelVisibility() {
             if (!this.isOpen()) {
-                this.setupTimeLayout()
+                this.updateHandAngle()
             }
 
             this.$refs.panel.toggle(this.$refs.button)
@@ -322,14 +350,6 @@ export default function clockTimePickerFormComponent({
             } else {
                 this.handangle += diff
             }
-        },
-
-        setupTimeLayout() {
-            this.shortHours = this.getLength(12, 1)
-            this.hours = this.getLength(12, 13)
-            this.minutes = this.getLength(60, 0)
-            this.seconds = this.getLength(60, 0)
-            this.updateHandAngle()
         },
 
         selectTime() {

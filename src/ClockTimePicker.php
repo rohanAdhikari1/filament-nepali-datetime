@@ -61,9 +61,6 @@ class ClockTimePicker extends Field implements HasAffixActions
      */
     protected array | Closure $disabledTimes = [];
 
-    /**
-     * @return array<StateCast>
-     */
     public function getDefaultStateCasts(): array
     {
         return [
@@ -79,7 +76,7 @@ class ClockTimePicker extends Field implements HasAffixActions
 
     public function getInternalFormat(): string
     {
-        return $this->hasSeconds() ? 'H:i:s' : 'H:i';
+        return 'H:i:s';
     }
 
     public function displayFormat(string | Closure | null $format): static
@@ -251,7 +248,6 @@ class ClockTimePicker extends Field implements HasAffixActions
         if (blank($this->maxTime)) {
             return null;
         }
-
         return $this->getNepaliFormatTime($this->maxTime);
     }
 
@@ -260,7 +256,6 @@ class ClockTimePicker extends Field implements HasAffixActions
         if (blank($this->minTime)) {
             return null;
         }
-
         return $this->getNepaliFormatTime($this->minTime);
     }
 
