@@ -30,15 +30,16 @@ export default function clockTimePickerFormComponent({
         handangle: 0,
 
         init() {
-            this.view = defaultView ?? 'hour'
-            const timeArray = this.parseTimeToArray(defaultFocusedTime) || [
-                12, 0, 0,
-            ]
-            let [hour, minute, second] = timeArray
+            const timeArray = this.parseTimeToArray(
+                this.state ?? defaultFocusedTime,
+            ) || [12, 0, 0]
+            let [hour, minute, second] = this.isTimeDisabled(timeArray)
+                ? [12, 0, 0]
+                : timeArray
             this.meridian = hour >= 12 ? 'PM' : 'AM'
             this.hour = hour % 12 || 12
             this.minute = minute
-            this.second = second
+            this.second = hasSeconds ? second : 0
 
             this.setDisplayText()
             if (isAutofocused) {
@@ -46,6 +47,24 @@ export default function clockTimePickerFormComponent({
                     this.togglePanelVisibility(this.$refs.button),
                 )
             }
+
+            this.$watch('state', () => {
+                if (this.state === undefined) {
+                    return
+                }
+                const timeArray = this.parseTimeToArray(this.state) || [
+                    12, 0, 0,
+                ]
+                let [hour, minute, second] = this.isTimeDisabled(timeArray)
+                    ? [12, 0, 0]
+                    : timeArray
+                this.meridian = hour >= 12 ? 'PM' : 'AM'
+                this.hour = hour % 12 || 12
+                this.minute = minute
+                this.second = hasSeconds ? second : 0
+                this.updateHandAngle()
+                this.setDisplayText()
+            })
         },
 
         toNumber(num) {
@@ -109,15 +128,7 @@ export default function clockTimePickerFormComponent({
             if (angle < 0) angle += 360
             const step = 360 / this.getCurrentUnitMax()
             let unitValue = Math.round(angle / step) % this.getCurrentUnitMax()
-            const unit = this.view
-            const candidate = [...this.getSelectedTimeArray()]
-            if (unit === 'hour') candidate[0] = unitValue
-            if (unit === 'minute') candidate[1] = unitValue
-            if (unit === 'second') candidate[2] = unitValue
-
-            if (!this.isTimeDisabled(candidate)) {
-                this.setCurrentUnitValue(unitValue)
-            }
+            this.setCurrentUnitValue(unitValue)
         },
 
         findNextEnabled(unit, direction = 1) {
@@ -195,9 +206,9 @@ export default function clockTimePickerFormComponent({
                 this.$refs?.disabledTimes &&
                 JSON.parse(this.$refs.disabledTimes.value ?? []).some(
                     (disabled) => {
-                        const disabledSeconds =
-                            this.timeArrayToSeconds(disabled)
-
+                        const disabledSeconds = this.timeArrayToSeconds(
+                            this.parseTimeToArray(disabled),
+                        )
                         return timeSeconds === disabledSeconds
                     },
                 )
@@ -255,18 +266,6 @@ export default function clockTimePickerFormComponent({
             return [hour, this.minute, this.second]
         },
 
-        getSelectedTime() {
-            if (this.state === undefined) {
-                return null
-            }
-
-            if (this.state === null) {
-                return null
-            }
-
-            return time
-        },
-
         getSelectedTimeFormatted(format = 'HH:mm:ss') {
             return this.formatTimeWithFormatString(
                 this.getSelectedTimeArray(),
@@ -295,6 +294,9 @@ export default function clockTimePickerFormComponent({
             return `left: ${x}%; top: ${y}%; transform: translate(-50%, -50%);`
         },
         togglePanelVisibility() {
+            if (!this.view) {
+                this.view = defaultView ?? 'hour'
+            }
             if (!this.isOpen()) {
                 this.updateHandAngle()
             }

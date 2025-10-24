@@ -108,49 +108,52 @@
 
                 <div class="fi-fo-nepali-clock-time-picker-clock-wrapper">
                     <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock">
-                        <div x-show="view === 'hour'" x-transition:enter.duration.500ms
-                            x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
-                            x-cloak>
-                            <template x-for="h in getLength(12, 1)" x-bind:key="h">
-                                <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(h, 12)"
-                                    x-text="toNumber(h)" x-on:click="selectHour(h)" x-bind:aria-selected="h === hour"
-                                    x-bind:class="{
-                                        'fi-selected': h === hour,
-                                        'fi-disabled': hourDisabled(h),
-                                    }">
-                                </div>
-                            </template>
-                        </div>
+                        <template x-if="view === 'hour'">
+                            <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
+                                x-transition:enter.scale.80 x-transition:leave.scale.90>
+                                <template x-for="h in getLength(12, 1)" x-bind:key="h">
+                                    <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(h, 12)"
+                                        x-text="toNumber(h)" x-on:click="selectHour(h)"
+                                        x-bind:aria-selected="h === hour"
+                                        x-bind:class="{
+                                            'fi-selected': h === hour,
+                                            'fi-disabled': hourDisabled(h),
+                                        }">
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <template x-if="view === 'minute'">
+                            <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
+                                x-transition:enter.scale.80 x-transition:leave.scale.90>
+                                <template x-for="m in getLength(60, 0)" x-bind:key="m">
+                                    <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(m, 60)"
+                                        x-text="m%5?'':toNumber(m)" x-on:click="selectMinute(m)"
+                                        x-bind:aria-selected="m === minute"
+                                        x-bind:class="{
+                                            'fi-selected': m === minute,
+                                            'fi-disabled': minuteDisabled(m),
+                                        }">
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
 
-                        <div x-show="view === 'minute'" x-transition:enter.duration.500ms
-                            x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
-                            x-cloak>
-                            <template x-for="m in getLength(60, 0)" x-bind:key="m">
-                                <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(m, 60)"
-                                    x-text="m%5?'':toNumber(m)" x-on:click="selectMinute(m)"
-                                    x-bind:aria-selected="m === minute"
-                                    x-bind:class="{
-                                        'fi-selected': m === minute,
-                                        'fi-disabled': minuteDisabled(m),
-                                    }">
-                                </div>
-                            </template>
-                        </div>
-
-                        <div x-show="view === 'second'" x-transition:enter.duration.500ms
-                            x-transition:leave.duration.400ms x-transition:enter.scale.80 x-transition:leave.scale.90
-                            x-cloak>
-                            <template x-for="s in getLength(60, 0)" x-bind:key="s">
-                                <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(s, 60)"
-                                    x-text="s%5?'':toNumber(s)" x-on:click="selectSecond(s)"
-                                    x-bind:aria-selected="s === second"
-                                    x-bind:class="{
-                                        'fi-selected': s === second,
-                                        'fi-disabled': secondDisabled(s),
-                                    }">
-                                </div>
-                            </template>
-                        </div>
+                        <template x-if="view === 'second'">
+                            <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
+                                x-transition:enter.scale.80 x-transition:leave.scale.90>
+                                <template x-for="s in getLength(60, 0)" x-bind:key="s">
+                                    <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(s, 60)"
+                                        x-text="s%5?'':toNumber(s)" x-on:click="selectSecond(s)"
+                                        x-bind:aria-selected="s === second"
+                                        x-bind:class="{
+                                            'fi-selected': s === second,
+                                            'fi-disabled': secondDisabled(s),
+                                        }">
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
 
                         <div class="fi-fo-nepali-clock-time-picker-clock-hand" @pointerdown.prevent="isDragging = true"
                             @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false"
