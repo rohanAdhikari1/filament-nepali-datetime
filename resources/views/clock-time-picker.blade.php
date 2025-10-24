@@ -38,10 +38,11 @@
             x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('filament-nepali-clock-time-picker', 'rohanadhikari/filament-nepali-datetime') }}"
             x-data="clockTimePickerFormComponent({
                 defaultFocusedTime: @js($getDefaultFocusedTime()),
+                hasSeconds: @js($hasSeconds),
                 displayFormat: '{{ convert_date_format($getDisplayFormat())->to('day.js') }}',
+                defaultView: @js(null),
                 isAutofocused: @js($isAutofocused),
                 locale: @js($getLocale()),
-                defaultView: @js(null),
                 shouldCloseOnTimeSelection: @js($shouldCloseOnTimeSelection()),
                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             })" wire:ignore

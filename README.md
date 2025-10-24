@@ -29,6 +29,11 @@ composer require rohanadhikari/filament-nepali-datetime
 ![Nepali Date Picker](.github/screenshots/datepicker-1.png)
 ![Nepali Date Picker](.github/screenshots/datepicker-2.png)
 
+### CLock TimePicker
+
+![Nepali Clock Picker](.github/screenshots/clockpicker-np.png)
+![Nepali Clock Picker](.github/screenshots/clockpicker-en.png)
+
 ### Nepali Functions
 
 ![Nepali Functions](.github/screenshots/textentry-1.png)

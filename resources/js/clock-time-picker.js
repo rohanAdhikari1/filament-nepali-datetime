@@ -2,6 +2,7 @@ import { localenumber } from 'nepali-day-js/locale'
 
 export default function clockTimePickerFormComponent({
     defaultFocusedTime,
+    hasSeconds,
     displayFormat,
     defaultView,
     isAutofocused,
@@ -128,22 +129,27 @@ export default function clockTimePickerFormComponent({
         },
 
         focusNextView(select = false) {
-            if (this.view === 'hour') {
-                this.view = 'minute'
-            } else if (this.view === 'minute') {
-                this.view = 'second'
-            } else {
-                if (select) {
-                    this.selectTime()
-                }
+            const nextViews = {
+                hour: 'minute',
+                minute: hasSeconds ? 'second' : null,
+            }
+
+            if (nextViews[this.view]) {
+                this.setView(nextViews[this.view])
+            } else if (select) {
+                this.selectTime()
+                this.resetView()
             }
         },
 
         focusPrevView() {
-            if (this.view === 'second') {
-                this.view = 'minute'
-            } else if (this.view === 'minute') {
-                this.view = 'hour'
+            const prevViews = {
+                second: 'minute',
+                minute: 'hour',
+            }
+
+            if (prevViews[this.view]) {
+                this.view = prevViews[this.view]
             }
         },
 
@@ -339,7 +345,7 @@ export default function clockTimePickerFormComponent({
         selectHour(hour) {
             this.setHour(hour)
             this.reFocusInput()
-            this.focusNextView()
+            if (shouldCloseOnTimeSelection) this.focusNextView(true)
         },
 
         setMinute(minute) {
@@ -354,7 +360,7 @@ export default function clockTimePickerFormComponent({
         selectMinute(minute) {
             this.setMinute(minute)
             this.reFocusInput()
-            this.focusNextView()
+            if (shouldCloseOnTimeSelection) this.focusNextView(true)
         },
 
         setSecond(second) {
@@ -369,7 +375,7 @@ export default function clockTimePickerFormComponent({
         selectSecond(second) {
             this.setSecond(second)
             this.reFocusInput()
-            this.focusNextView(true)
+            if (shouldCloseOnTimeSelection) this.focusNextView(true)
         },
 
         setMeridian(meridian) {
@@ -384,6 +390,10 @@ export default function clockTimePickerFormComponent({
             this.view = view
             this.updateHandAngle()
             this.reFocusInput()
+        },
+
+        resetView() {
+            this.view = defaultView ?? 'hour'
         },
 
         setState(date) {

@@ -55,16 +55,14 @@ class ClockTimePicker extends Field implements HasAffixActions
 
     protected string | Closure | null $locale = null;
 
-    protected int | Closure $hourMode = 12;
-
     /**
      * @var array<DateTime | NepaliDate | string> | Closure
      */
     protected array | Closure $disabledTimes = [];
 
-    // /**
-    //  * @return array<StateCast>
-    //  */
+    /**
+     * @return array<StateCast>
+     */
     public function getDefaultStateCasts(): array
     {
         return [
@@ -72,6 +70,7 @@ class ClockTimePicker extends Field implements HasAffixActions
             app(NepaliDateTimeStateCast::class, [
                 'format' => $this->getFormat(),
                 'internalFormat' => $this->getInternalFormat(),
+                'locale' => $this->getLocale(),
                 'timezone' => $this->getTimezone(),
             ]),
         ];
