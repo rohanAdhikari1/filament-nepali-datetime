@@ -149,7 +149,7 @@ export default function clockTimePickerFormComponent({
             }
 
             if (prevViews[this.view]) {
-                this.view = prevViews[this.view]
+                this.setView(prevViews[this.view])
             }
         },
 
