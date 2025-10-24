@@ -40,7 +40,7 @@ export default function clockTimePickerFormComponent({
         init() {
             this.view = defaultView ?? 'hour'
             const timeArray = this.parseTimeToArray(defaultFocusedTime) || [
-                1, 0, 0,
+                12, 0, 0,
             ]
             let [hour, minute, second] = timeArray
             this.meridian = hour >= 12 ? 'PM' : 'AM'

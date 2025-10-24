@@ -18,6 +18,7 @@ use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Carbon;
 use Illuminate\View\ComponentAttributeBag;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
+use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
 use RohanAdhikari\NepaliDate\NepaliDate;
 use RohanAdhikari\NepaliDate\NepaliDateInterface;
 
@@ -223,14 +224,44 @@ class ClockTimePicker extends Field implements HasAffixActions
         return $this->getFormat();
     }
 
+    public function getNepaliFormatTime(CarbonInterface | NepaliDate | string | Closure $date): ?string
+    {
+        $date = $this->evaluate($date);
+        if ($date instanceof CarbonInterface) {
+            $date = NepaliDate::fromAd($date->toDateTime());
+        }
+        if (! $date instanceof NepaliDate) {
+            try {
+                $date = NepaliDate::createFromFormat($this->getFormat(), (string) $date);
+            } catch (NepaliDateFormatException) {
+                try {
+                    $date = NepaliDate::parse($date);
+                } catch (NepaliDateFormatException) {
+                    return null;
+                }
+            }
+        }
+
+        return $date->setTimezone($this->getTimezone())->format($this->getInternalFormat());
+    }
+
+
     public function getMaxTime(): ?string
     {
-        return $this->evaluate($this->maxTime);
+        if (blank($this->maxTime)) {
+            return null;
+        }
+
+        return $this->getNepaliFormatTime($this->maxTime);
     }
 
     public function getMinTime(): ?string
     {
-        return $this->evaluate($this->minTime);
+        if (blank($this->minTime)) {
+            return null;
+        }
+
+        return $this->getNepaliFormatTime($this->minTime);
     }
 
     public function getDefaultFocusedTime(): ?string
@@ -238,19 +269,7 @@ class ClockTimePicker extends Field implements HasAffixActions
         $defaultFocusedTime = $this->evaluate($this->defaultFocusedTime);
 
         if (filled($defaultFocusedTime)) {
-            if (! $defaultFocusedTime instanceof CarbonInterface) {
-                try {
-                    $defaultFocusedTime = Carbon::createFromFormat($this->getFormat(), (string) $defaultFocusedTime, config('app.timezone'));
-                } catch (InvalidFormatException $exception) {
-                    try {
-                        $defaultFocusedTime = Carbon::parse($defaultFocusedTime, config('app.timezone'));
-                    } catch (InvalidFormatException $exception) {
-                        return null;
-                    }
-                }
-            }
-
-            $defaultFocusedTime = $defaultFocusedTime->setTimezone($this->getTimezone());
+            $defaultFocusedTime = $this->getNepaliFormatTime($defaultFocusedTime);
         }
 
         return $defaultFocusedTime;
@@ -261,7 +280,14 @@ class ClockTimePicker extends Field implements HasAffixActions
      */
     public function getDisabledTimes(): array
     {
-        return $this->evaluate($this->disabledTimes);
+        $disabledTimes = $this->evaluate($this->disabledTimes);
+        if (blank($disabledTimes)) {
+            return [];
+        }
+
+        return collect($disabledTimes)
+            ->map(fn($time) => $this->getNepaliFormatTime($time))
+            ->toArray();
     }
 
     public function getTimezone(): string
