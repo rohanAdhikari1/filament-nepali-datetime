@@ -177,6 +177,15 @@ The DatePicker supports keyboard navigation for accessibility and ease of use.
 
 `ClockTimePicker` provides an interactive clock interface that allows users to select a time visually. It offers a more intuitive way to pick hours, minutes and seconds compared to traditional input fields.
 
+> [!Important]
+> IF you are using Filament Panels, you must have to set up a custom theme. to setup follow the instruction in the [Filament Custom Theme Doc](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme)
+
+After setting up custom theme add the Clocktime picker css to your theme css file.
+
+```css
+@import '../../../../vendor/rohanadhikari/filament-nepali-datetime/resources/css/clock-time-picker.css';
+```
+
 #### Usage
 
 ```php
