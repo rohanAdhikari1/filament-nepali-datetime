@@ -5,6 +5,7 @@ namespace RohanAdhikari\FilamentNepaliDatetime;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
+use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Tables\Columns\TextColumn;
 use RohanAdhikari\FilamentNepaliDatetime\TextColumn\TextColumnMixin;
@@ -65,6 +66,8 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
     {
         return [
             AlpineComponent::make('filament-nepali-datetime-picker', __DIR__ . '/../resources/dist/filament-nepali-datetime.js'),
+            AlpineComponent::make('filament-nepali-clock-time-picker', __DIR__ . '/../resources/dist/clock-time-picker.js'),
+            Css::make('clock-time-picker', __DIR__ . '/../resources/css/clock-time-picker.css'),
         ];
     }
 }

@@ -29,6 +29,11 @@ composer require rohanadhikari/filament-nepali-datetime
 ![Nepali Date Picker](.github/screenshots/datepicker-1.png)
 ![Nepali Date Picker](.github/screenshots/datepicker-2.png)
 
+### CLock TimePicker
+
+![Nepali Clock Picker](.github/screenshots/clockpicker-np.png)
+![Nepali Clock Picker](.github/screenshots/clockpicker-en.png)
+
 ### Nepali Functions
 
 ![Nepali Functions](.github/screenshots/textentry-1.png)
@@ -43,7 +48,7 @@ To use `NepaliDate`, please refer to the documentation of [`NepaliDate`](https:/
 ### 1. NepaliDateTimePicker
 
 > [!WARNING]  
-> If you are using `timestamp` and `datetime` column type consider using [`ADAsNepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP/blob/main/docs/LARAVEL.md#cast-attribute-to-nepalidate) cast in model.
+> If you are using `timestamp` and `datetime` column type consider using [`ADAsNepaliDate`](https://github.com/rohanAdhikari1/NepalIDatePHP/blob/main/docs/LARAVEL.md#cast-attribute-to-nepalidate) or `datetime` cast in model.
 
 It extends Filament [DateTimePicker](https://filamentphp.com/docs/4.x/forms/date-time-picker) to support **Nepali Date (BS)**.
 
@@ -168,7 +173,63 @@ The DatePicker supports keyboard navigation for accessibility and ease of use.
 
 ---
 
-### 2. Nepali Functions
+### 2. ClockTimePicker
+
+`ClockTimePicker` provides an interactive clock interface that allows users to select a time visually. It offers a more intuitive way to pick hours, minutes and seconds compared to traditional input fields.
+
+> [!Important]
+> IF you are using Filament Panels, you must have to set up a custom theme. to setup follow the instruction in the [Filament Custom Theme Doc](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme)
+
+After setting up custom theme add the Clocktime picker css to your theme css file.
+
+```css
+@import '../../../../vendor/rohanadhikari/filament-nepali-datetime/resources/css/clock-time-picker.css';
+```
+
+#### Usage
+
+```php
+    ClockTimePicker::make('nepali_time')
+       ->label('Nepali Time')
+       ->defaultFocusedTime(NepaliDate::now())
+       ->disabledTimes(['09:00 AM', '10:00 AM'])
+       ->maxTime('01:00 PM')
+       ->seconds(false)
+       ->closeOnTimeSelection()
+       ->locale('np')
+       ->suffixAction(
+           Action::make('now')
+            ->action(fn(Set $set) => $set('nepali_time', NepaliDate::now()))
+       ),
+```
+
+---
+
+#### Close picker after selecting time
+
+Use `->closeOnTimeSelection()` to automatically close the picker once a time is selected:
+
+```php
+ClockTimePicker::make('nepali_time')
+       ->label('Nepali Time')
+       ->closeOnTimeSelection()
+```
+
+---
+
+#### Disable Second Selection
+
+Use `->seconds(false)` to disable seconds selection:
+
+```php
+ClockTimePicker::make('nepali_time')
+       ->label('Nepali Time')
+       ->seconds(false)
+```
+
+---
+
+### 3. Nepali Functions
 
 The following functions are available on TextColumn and TextEntry.
 
