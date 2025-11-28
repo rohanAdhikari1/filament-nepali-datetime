@@ -1,0 +1,14 @@
+.fi-fo-nepali-date-time-range-picker {
+    & .fi-fo-nepali-date-time-range-picker-trigger {
+        @apply w-full;
+    }
+
+    & .fi-fo-nepali-date-time-range-picker-display-text-input {
+        @apply w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:var(--color-gray-500)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:var(--color-gray-400)];
+    }
+
+    & .fi-fo-nepali-date-time-range-picker-panel {
+        @apply absolute z-10 space-y-3 rounded-lg bg-white p-4 shadow-lg ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+        /* Todo: Add custom styles for the date-time range picker panel here. */
+    }
+}
