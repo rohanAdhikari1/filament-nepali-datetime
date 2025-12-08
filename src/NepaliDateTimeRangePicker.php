@@ -2,9 +2,7 @@
 
 namespace RohanAdhikari\FilamentNepaliDatetime;
 
-use BackedEnum;
 use Carbon\CarbonInterface;
-use Carbon\Exceptions\InvalidFormatException;
 use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Field;
@@ -13,8 +11,6 @@ use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Schemas\Components\StateCasts\DateTimeStateCast;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Facades\FilamentTimezone;
-use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Carbon;
 use Illuminate\View\ComponentAttributeBag;
 use RohanAdhikari\FilamentNepaliDateTime\Concerns\useDateRangeOptions;
 use RohanAdhikari\NepaliDate\NepaliDate;
@@ -56,8 +52,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
     protected CarbonInterface | NepaliDate | string | Closure | null $maxDate = null;
 
     protected CarbonInterface | NepaliDate | string | Closure | null $minDate = null;
-
-    protected CarbonInterface | NepaliDate | string | Closure | null $defaultFocusedDate = null;
 
     protected string | Closure | null $timezone = null;
 
@@ -150,13 +144,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
     public function minDate(CarbonInterface | NepaliDateInterface | string | Closure | null $date): static
     {
         $this->minDate = $date;
-
-        return $this;
-    }
-
-    public function defaultFocusedDate(CarbonInterface | NepaliDateInterface | string | Closure | null $date): static
-    {
-        $this->defaultFocusedDate = $date;
 
         return $this;
     }
@@ -323,7 +310,7 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
             return $format;
         }
 
-        $format = $this->hasDate() ? 'Y-m-d' : '';
+        $format = 'Y-m-d';
 
         if (! $this->hasTime()) {
             return $format;
@@ -346,29 +333,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
     public function getMinDate(): ?string
     {
         return $this->evaluate($this->minDate);
-    }
-
-    public function getDefaultFocusedDate(): ?string
-    {
-        $defaultFocusedDate = $this->evaluate($this->defaultFocusedDate);
-
-        if (filled($defaultFocusedDate)) {
-            if (! $defaultFocusedDate instanceof CarbonInterface) {
-                try {
-                    $defaultFocusedDate = Carbon::createFromFormat($this->getFormat(), (string) $defaultFocusedDate, config('app.timezone'));
-                } catch (InvalidFormatException $exception) {
-                    try {
-                        $defaultFocusedDate = Carbon::parse($defaultFocusedDate, config('app.timezone'));
-                    } catch (InvalidFormatException $exception) {
-                        return null;
-                    }
-                }
-            }
-
-            $defaultFocusedDate = $defaultFocusedDate->setTimezone($this->getTimezone());
-        }
-
-        return $defaultFocusedDate;
     }
 
     public function getTimezone(): string

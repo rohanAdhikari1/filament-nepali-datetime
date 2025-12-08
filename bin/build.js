@@ -66,9 +66,11 @@ const defaultOptions = {
 
 compile({
     ...defaultOptions,
-    entryPoints: [
-        './resources/js/index.js',
-        './resources/js/clock-time-picker.js',
-    ],
+    entryPoints: {
+        'filament-nepali-datetime': './resources/js/index.js',
+        'clock-time-picker': './resources/js/clock-time-picker.js',
+        'nepali-date-time-range-picker':
+            './resources/js/nepali-date-time-range-picker.js',
+    },
     outdir: './resources/dist',
 })

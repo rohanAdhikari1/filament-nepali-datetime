@@ -1,0 +1,93 @@
+.fi-fo-ndtr-picker {
+    & .fi-fo-ndtr-picker-trigger {
+        @apply w-full;
+    }
+
+    & .fi-fo-ndtr-picker-display-text-input {
+        @apply w-full border-none bg-transparent px-3 py-1.5 text-sm leading-6 text-gray-950 outline-none transition duration-75 placeholder:text-gray-400 focus:ring-0 disabled:text-gray-500 disabled:[-webkit-text-fill-color:var(--color-gray-500)] dark:text-white dark:placeholder:text-gray-500 dark:disabled:text-gray-400 dark:disabled:[-webkit-text-fill-color:var(--color-gray-400)];
+    }
+
+    & .fi-fo-ndtr-picker-panel {
+        @apply absolute z-10 rounded-lg bg-white p-1.5 shadow-lg ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+
+
+        & .fi-fo-ndtr-picker-container {
+            @apply flex gap-1;
+
+            & .fi-fo-ndtr-picker-range-labels-section {
+                @apply border-e px-1 border-gray-200 dark:border-gray-700;
+
+                & .fi-fo-ndtr-picker-range-label {
+                    @apply cursor-pointer py-2 px-4;
+
+                    &:hover {
+                        @apply bg-gray-50 dark:bg-white/5;
+                    }
+
+                    &.fi-selected {
+                        @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                    }
+                }
+            }
+
+            & .fi-fo-ndtr-picker-range-calendar-section {
+                @apply space-y-2 p-1;
+
+                & .fi-fo-ndtr-picker-range-calendar-section-header {
+                    @apply flex items-center justify-between;
+
+                    & .fi-fo-ndtr-picker-select {
+                        @apply grow cursor-pointer border-none bg-transparent p-0 text-sm font-medium text-gray-950 focus:ring-0 dark:bg-gray-900 dark:text-white;
+                    }
+                }
+
+                & .fi-fo-ndtr-picker-calendar-header {
+                    @apply grid grid-cols-7 gap-1;
+
+                    & .fi-fo-ndtr-picker-calendar-header-day {
+                        @apply text-center text-xs font-medium text-gray-500 dark:text-gray-400;
+                    }
+                }
+
+                & .fi-fo-ndtr-picker-calendar {
+                    @apply grid gap-1;
+                    grid-template-columns: repeat(7, minmax(1.75rem, 1fr));
+
+                    & .fi-fo-ndtr-picker-calendar-day {
+                        @apply rounded-full text-center text-sm leading-loose transition duration-75;
+
+                        &.fi-disabled {
+                            @apply pointer-events-none opacity-50;
+                        }
+
+                        &:not(.fi-disabled) {
+                            @apply cursor-pointer;
+                        }
+
+                        &.fi-selected {
+                            @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                        }
+
+                        &.fi-focused:not(.fi-selected):not(.fi-disabled) {
+                            @apply bg-gray-100 dark:bg-white/10;
+                        }
+
+                        &.fi-fo-date-time-picker-calendar-day-today:not(.fi-focused):not(.fi-selected):not(.fi-disabled) {
+                            @apply text-primary-600 dark:text-primary-400;
+                        }
+
+                        &:not(.fi-fo-date-time-picker-calendar-day-today):not(.fi-selected) {
+                            @apply text-gray-950 dark:text-white;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        & .fi-fo-ndtr-picker-footer {
+            @apply flex items-center justify-end gap-2 px-1 pt-2 border-t border-gray-200 dark:border-gray-700;
+        }
+
+    }
+}

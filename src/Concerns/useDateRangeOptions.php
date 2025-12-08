@@ -21,6 +21,8 @@ trait useDateRangeOptions
 
     protected bool | Closure $showCustomRangeLabel = false;
 
+    protected bool | Closure $showRangeLabels = true;
+
     protected array | Closure $ranges = [];
 
     protected array | Closure $appendRanges = [];
@@ -64,6 +66,13 @@ trait useDateRangeOptions
         return $this;
     }
 
+    public function showRangeLabels(bool | Closure $condition = true): static
+    {
+        $this->showRangeLabels = $condition;
+
+        return $this;
+    }
+
     public function showCustomRangeLabel(bool | Closure $condition = true): static
     {
         $this->showCustomRangeLabel = $condition;
@@ -97,5 +106,12 @@ trait useDateRangeOptions
         $this->prependRanges = $ranges;
 
         return $this;
+    }
+
+    //getters
+
+    public function getShowRangeLabels(): bool
+    {
+        return $this->evaluate($this->showRangeLabels);
     }
 }

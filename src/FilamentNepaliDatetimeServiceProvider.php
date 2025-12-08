@@ -67,7 +67,9 @@ class FilamentNepaliDatetimeServiceProvider extends PackageServiceProvider
         return [
             AlpineComponent::make('filament-nepali-datetime-picker', __DIR__ . '/../resources/dist/filament-nepali-datetime.js'),
             AlpineComponent::make('filament-nepali-clock-time-picker', __DIR__ . '/../resources/dist/clock-time-picker.js'),
+            AlpineComponent::make('filament-nepali-datetime-range-picker', __DIR__ . '/../resources/dist/nepali-date-time-range-picker.js'),
             Css::make('clock-time-picker', __DIR__ . '/../resources/css/clock-time-picker.css'),
+            Css::make('nepali-date-time-range-picker', __DIR__ . '/../resources/css/nepali-date-time-range-picker.css'),
         ];
     }
 }

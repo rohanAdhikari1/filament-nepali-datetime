@@ -24,7 +24,7 @@
         "filament/forms": "^4.0",
         "filament/infolists": "^4.0",
         "filament/tables": "^4.0",
-        "rohanadhikari/nepali-date": "^0.0.3"
+        "rohanadhikari/nepali-date": "^0.0.4"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
