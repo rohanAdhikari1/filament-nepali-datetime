@@ -27,9 +27,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
     use HasExtraAlpineAttributes;
     use useDateRangeOptions;
 
-    /**
-     * @var view-string
-     */
     protected string $view = 'filament-nepali-datetime::nepali-date-time-range-picker';
 
     protected string | Closure | null $displayFormat = null;
@@ -256,17 +253,17 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
 
     public function getDefaultDateDisplayFormat(): string
     {
-        return (string)$this->evaluate($this->defaultDateDisplayFormat);
+        return (string) $this->evaluate($this->defaultDateDisplayFormat);
     }
 
     public function getDefaultDateTimeDisplayFormat(): string
     {
-        return (string)$this->evaluate($this->defaultDateTimeDisplayFormat);
+        return (string) $this->evaluate($this->defaultDateTimeDisplayFormat);
     }
 
     public function getDefaultDateTimeWithSecondsDisplayFormat(): string
     {
-        return (string)$this->evaluate($this->defaultDateTimeWithSecondsDisplayFormat);
+        return (string) $this->evaluate($this->defaultDateTimeWithSecondsDisplayFormat);
     }
 
     /**
@@ -307,7 +304,7 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
             return $format;
         }
 
-        $format = $format ? "{$format} H:i" : 'H:i';
+        $format = "{$format} H:i";
 
         if (! $this->hasSeconds()) {
             return $format;

@@ -6,7 +6,7 @@ use RohanAdhikari\NepaliDate\NepaliDate;
 
 class NepaliRange
 {
-    public function __construct(
+    final public function __construct(
         public string $label,
         public string | NepaliDate $startDate,
         public string | NepaliDate $endDate,

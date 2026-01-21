@@ -31,7 +31,7 @@ trait useDateRangeOptions
 
     protected array | Closure $prependRanges = [];
 
-    protected RangeSpan | null $maxSpan = null;
+    protected ?RangeSpan $maxSpan = null;
 
     public function startDate(CarbonInterface | NepaliDateInterface | string | Closure $date): static
     {
@@ -82,7 +82,7 @@ trait useDateRangeOptions
         return $this;
     }
 
-    public function maxSpan(RangeSpan | null $maxSpan): static
+    public function maxSpan(?RangeSpan $maxSpan): static
     {
         $this->maxSpan = $maxSpan;
 
@@ -122,7 +122,7 @@ trait useDateRangeOptions
         return $this;
     }
 
-    public function evaluateNepaliDate(string | NepaliDateInterface | CarbonInterface | Closure | null $date): NepaliDateInterface | null
+    public function evaluateNepaliDate(string | NepaliDateInterface | CarbonInterface | Closure | null $date): ?NepaliDateInterface
     {
         if (blank($date)) {
             return null;
@@ -138,25 +138,26 @@ trait useDateRangeOptions
         if ($date instanceof CarbonInterface) {
             return NepaliDate::fromAd($date->toDateTime());
         }
-        if (!$date instanceof NepaliDateInterface) {
+        if (! $date instanceof NepaliDateInterface) {
             return null;
         }
+
         return $date;
     }
 
-    //getters
+    // getters
 
     public function getShowRangeLabels(): bool
     {
         return $this->evaluate($this->showRangeLabels);
     }
 
-    public function getStartDate(): NepaliDateInterface | null
+    public function getStartDate(): ?NepaliDateInterface
     {
         return $this->evaluateNepaliDate($this->startDate);
     }
 
-    public function getEndDate(): NepaliDateInterface | null
+    public function getEndDate(): ?NepaliDateInterface
     {
         return $this->evaluateNepaliDate($this->endDate);
     }
@@ -181,7 +182,7 @@ trait useDateRangeOptions
         return $this->evaluate($this->showCustomRangeLabel);
     }
 
-    public function getMaxSpan(): array | null
+    public function getMaxSpan(): ?array
     {
         return $this->maxSpan?->toArray();
     }
@@ -191,6 +192,7 @@ trait useDateRangeOptions
         $prependRanges = $this->evaluate($this->prependRanges);
         $ranges = $this->evaluate($this->ranges);
         $appendRanges = $this->evaluate($this->appendRanges);
+
         return [...$prependRanges, ...$ranges, ...$appendRanges];
     }
 }

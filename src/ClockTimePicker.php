@@ -3,7 +3,6 @@
 namespace RohanAdhikari\FilamentNepaliDatetime;
 
 use Carbon\CarbonInterface;
-use Carbon\Exceptions\InvalidFormatException;
 use Closure;
 use DateTime;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
@@ -15,7 +14,6 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\Contracts\HasAffixActions;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Facades\FilamentTimezone;
-use Illuminate\Support\Carbon;
 use Illuminate\View\ComponentAttributeBag;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
 use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
@@ -111,9 +109,7 @@ class ClockTimePicker extends Field implements HasAffixActions
     {
         $this->maxTime = $time;
 
-        $this->rule(static function (ClockTimePicker $component) {
-            return "before_or_equal:{$component->getMaxTime()}";
-        }, static fn(ClockTimePicker $component): bool => (bool) $component->getMaxTime());
+        $this->rule(static fn(ClockTimePicker $component) => "before_or_equal:{$component->getMaxTime()}", static fn (ClockTimePicker $component): bool => (bool) $component->getMaxTime());
 
         return $this;
     }
@@ -122,9 +118,7 @@ class ClockTimePicker extends Field implements HasAffixActions
     {
         $this->minTime = $time;
 
-        $this->rule(static function (ClockTimePicker $component) {
-            return "after_or_equal:{$component->getMinTime()}";
-        }, static fn(ClockTimePicker $component): bool => (bool) $component->getMinTime());
+        $this->rule(static fn(ClockTimePicker $component) => "after_or_equal:{$component->getMinTime()}", static fn (ClockTimePicker $component): bool => (bool) $component->getMinTime());
 
         return $this;
     }
@@ -242,12 +236,12 @@ class ClockTimePicker extends Field implements HasAffixActions
         return $date->setTimezone($this->getTimezone())->format($this->getInternalFormat());
     }
 
-
     public function getMaxTime(): ?string
     {
         if (blank($this->maxTime)) {
             return null;
         }
+
         return $this->getNepaliFormatTime($this->maxTime);
     }
 
@@ -256,6 +250,7 @@ class ClockTimePicker extends Field implements HasAffixActions
         if (blank($this->minTime)) {
             return null;
         }
+
         return $this->getNepaliFormatTime($this->minTime);
     }
 
@@ -281,7 +276,7 @@ class ClockTimePicker extends Field implements HasAffixActions
         }
 
         return collect($disabledTimes)
-            ->map(fn($time) => $this->getNepaliFormatTime($time))
+            ->map(fn ($time) => $this->getNepaliFormatTime($time))
             ->toArray();
     }
 

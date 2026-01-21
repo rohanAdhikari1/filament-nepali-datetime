@@ -4,7 +4,7 @@ namespace RohanAdhikari\FilamentNepaliDateTime\Model;
 
 class RangeSpan
 {
-    public function __construct(
+    final public function __construct(
         public int $days,
         public int $months = 0,
         public int $years = 0,
