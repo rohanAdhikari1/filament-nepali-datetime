@@ -50,7 +50,7 @@
                 }
 
                 & .fi-fo-ndtr-picker-calendar {
-                    @apply grid gap-1;
+                    @apply grid;
                     grid-template-columns: repeat(7, minmax(1.75rem, 1fr));
 
                     & .fi-fo-ndtr-picker-calendar-day {
@@ -64,19 +64,27 @@
                             @apply cursor-pointer;
                         }
 
-                        &.fi-selected {
-                            @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
+                        &.fi-in-range {
+                            @apply text-primary-600 rounded-none dark:text-primary-400 bg-gray-200 dark:bg-white/15;
                         }
 
-                        &.fi-focused:not(.fi-selected):not(.fi-disabled) {
+                        &.fi-start {
+                            @apply text-primary-600 rounded-l-full rounded-r-none dark:text-primary-400 bg-gray-200 dark:bg-white/15;
+                        }
+
+                        &.fi-end {
+                            @apply text-primary-600 rounded-l-none rounded-r-full dark:text-primary-400 bg-gray-200 dark:bg-white/15;
+                        }
+
+                        &.fi-focused:not(.fi-disabled):not(.fi-start):not(.fi-end) {
                             @apply bg-gray-100 dark:bg-white/10;
                         }
 
-                        &.fi-fo-date-time-picker-calendar-day-today:not(.fi-focused):not(.fi-selected):not(.fi-disabled) {
+                        &.fi-fo-date-time-picker-calendar-day-today:not(.fi-start):not(.fi-end):not(.fi-disabled) {
                             @apply text-primary-600 dark:text-primary-400;
                         }
 
-                        &:not(.fi-fo-date-time-picker-calendar-day-today):not(.fi-selected) {
+                        &:not(.fi-fo-date-time-picker-calendar-day-today):not(.fi-start):not(.fi-end):not(.fi-in-range) {
                             @apply text-gray-950 dark:text-white;
                         }
                     }

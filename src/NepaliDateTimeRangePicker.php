@@ -47,8 +47,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
 
     protected bool | Closure $hasTime = true;
 
-    protected bool | Closure $shouldCloseOnDateSelection = false;
-
     protected CarbonInterface | NepaliDate | string | Closure | null $maxDate = null;
 
     protected CarbonInterface | NepaliDate | string | Closure | null $minDate = null;
@@ -218,13 +216,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
         return $this;
     }
 
-    public function closeOnDateSelection(bool | Closure $condition = true): static
-    {
-        $this->shouldCloseOnDateSelection = $condition;
-
-        return $this;
-    }
-
     public function getDisplayFormat(): string
     {
         $format = $this->evaluate($this->displayFormat);
@@ -327,12 +318,12 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
 
     public function getMaxDate(): ?string
     {
-        return $this->evaluate($this->maxDate);
+        return $this->evaluateNepaliDate($this->maxDate);
     }
 
     public function getMinDate(): ?string
     {
-        return $this->evaluate($this->minDate);
+        return $this->evaluateNepaliDate($this->minDate);
     }
 
     public function getTimezone(): string
@@ -369,11 +360,6 @@ class NepaliDateTimeRangePicker extends Field implements HasAffixActions
     public function getSecondsStep(): int
     {
         return $this->evaluate($this->secondsStep) ?? 1;
-    }
-
-    public function shouldCloseOnDateSelection(): bool
-    {
-        return (bool) $this->evaluate($this->shouldCloseOnDateSelection);
     }
 
     public function getStep(): int | float | string | null

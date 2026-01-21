@@ -42,7 +42,7 @@
                 firstDayOfWeek: {{ $getFirstDayOfWeek() }},
                 isAutofocused: @js($isAutofocused),
                 locale: @js($getLocale()),
-                shouldCloseOnDateSelection: @js($shouldCloseOnDateSelection()),
+                shouldCloseOnDateSelection: @js(true),
                 {{-- disableNavWhenOutOfRange: @js($getDisableNavWhenOutOfRange()), --}}
                 disableNavWhenOutOfRange: @js(false),
                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
@@ -54,20 +54,19 @@
 
             <input x-ref="minDate" type="hidden" value="{{ $minDate }}" />
 
-            <button x-ref="button" x-on:click="togglePanelVisibility()"{{-- 
+            <button x-ref="button" x-on:click="togglePanelVisibility()"
                 x-on:keydown.enter.prevent.stop="
                         if (! $el.disabled) {
                             isOpen() ? selectDate() : togglePanelVisibility()   
                         }
                     "
-                x-on:keydown.space.prevent.stop="if (! $el.disabled) selectFocusedDay()"
+                x-on:keydown.space.prevent.stop="if (! $el.disabled) selectDate()"{{-- 
                 x-on:keydown.alt.arrow-left.prevent.stop="if (! $el.disabled) focusPreviousMonth()"
                 x-on:keydown.alt.arrow-right.prevent.stop="if (! $el.disabled) focusNextMonth()"
                 x-on:keydown.alt.arrow-up.prevent.stop="if (! $el.disabled) focusPreviousYear()"
-                x-on:keydown.alt.arrow-down.prevent.stop="if (! $el.disabled) focusNextYear()"
+                x-on:keydown.alt.arrow-down.prevent.stop="if (! $el.disabled) focusNextYear()" --}}
                 x-on:keydown.arrow-left.prevent.stop="if (! $el.disabled) focusPreviousDay()"
-                x-on:keydown.arrow-right.prevent.stop="if (! $el.disabled) focusNextDay()"
-                x-on:keydown.arrow-up.prevent.stop="if (! $el.disabled) focusPreviousWeek()"
+                x-on:keydown.arrow-right.prevent.stop="if (! $el.disabled) focusNextDay()" {{-- x-on:keydown.arrow-up.prevent.stop="if (! $el.disabled) focusPreviousWeek()"
                 x-on:keydown.arrow-down.prevent.stop="if (! $el.disabled) focusNextWeek()"
                 x-on:keydown.home.prevent.stop="if (! $el.disabled) focusStartOfWeek()"
                 x-on:keydown.end.prevent.stop="if (! $el.disabled) focusEndOfWeek()"
@@ -77,8 +76,8 @@
                 x-on:keydown.shift.page-down.prevent.stop="if (! $el.disabled) focusNextYear()"
                 x-on:keydown.backspace.prevent.stop="if (! $el.disabled) clearState()"
                 x-on:keydown.clear.prevent.stop="if (! $el.disabled) clearState()"
-                x-on:keydown.delete.prevent.stop="if (! $el.disabled) clearState()" aria-label="{{ $placeholder }}" --}} type="button"
-                tabindex="-1" @disabled($isDisabled || $isReadOnly)
+                x-on:keydown.delete.prevent.stop="if (! $el.disabled) clearState()" aria-label="{{ $placeholder }}" --}}
+                type="button" tabindex="-1" @disabled($isDisabled || $isReadOnly)
                 {{ $getExtraTriggerAttributeBag()->class(['fi-fo-ndtr-picker-trigger']) }}>
                 <input @disabled($isDisabled) readonly placeholder="{{ $placeholder }}"
                     wire:key="{{ $livewireKey }}.display-text" x-model="displayText"
@@ -100,7 +99,8 @@
 
                     <div class="fi-fo-ndtr-picker-range-calendar-section">
                         <div class="fi-fo-ndtr-picker-range-calendar-section-header">
-                            <button x-show="isStartPrevActive" x-cloak type="button" x-on:click="focusPreviousMonth()">
+                            <button x-show="leftcalendar.isPrevActive" x-cloak type="button"
+                                x-on:click="leftcalendar.focusPreviousMonth()">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -108,19 +108,20 @@
                                 </svg>
                             </button>
 
-                            <select x-model="startFocusedMonth" class="fi-fo-ndtr-picker-select">
+                            <select x-model="leftcalendar.focusedMonth" class="fi-fo-ndtr-picker-select">
                                 <template x-for="(month, index) in months">
                                     <option x-bind:value="index + 1" x-text="month"></option>
                                 </template>
                             </select>
 
-                            <select x-model="startFocusedYear" class="fi-fo-ndtr-picker-select">
+                            <select x-model="leftcalendar.focusedYear" class="fi-fo-ndtr-picker-select">
                                 <template x-for="year in years">
                                     <option x-bind:value="year" x-text="toNumber(year)"></option>
                                 </template>
                             </select>
 
-                            <button x-show="isStartNextActive" x-cloak type="button" x-on:click="focusNextMonth()">
+                            <button x-show="leftcalendar.isNextActive" x-cloak type="button"
+                                x-on:click="leftcalendar.focusNextMonth()">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -134,19 +135,26 @@
                             </template>
                         </div>
                         <div role="grid" class="fi-fo-ndtr-picker-calendar">
-                            <template x-for="day in emptyDaysInStartFocusedMonth" x-bind:key="day">
+                            <template x-for="day in leftcalendar.emptyDaysInFocusedMonth" x-bind:key="day">
                                 <div></div>
                             </template>
 
-                            <template x-for="day in daysInStartFocusedMonth" x-bind:key="day">
-                                <div x-text="toNumber(day)" x-on:click="!dayIsDisabled(day) && selectDate(day)"
-                                    x-on:mouseenter="setFocusedDay(day)" role="option"
-                                    x-bind:aria-selected="focusedDate.day() === day"
+                            <template x-for="day in leftcalendar.daysInFocusedMonth" x-bind:key="day">
+                                <div x-text="toNumber(day)"
+                                    x-on:click="!dayIsDisabled(day,leftcalendar.focusedMonth,leftcalendar.focusedYear) && leftcalendar.selectDate(day)"
+                                    x-on:mouseenter="leftcalendar.setFocusedDay(day)" role="option"
                                     x-bind:class="{
-                                        'fi-fo-ndtr-picker-calendar-day-today': dayIsToday(day),
-                                        'fi-focused': focusedDate.day() === day,
-                                        'fi-selected': dayIsSelected(day),
-                                        'fi-disabled': dayIsDisabled(day),
+                                        'fi-fo-ndtr-picker-calendar-day-today': leftcalendar.dayIsToday(day),
+                                        'fi-start': isStartDate(day, leftcalendar.focusedMonth, leftcalendar
+                                            .focusedYear),
+                                        'fi-focused': isDateFocused(day, leftcalendar.focusedMonth, leftcalendar
+                                            .focusedYear),
+                                        'fi-end': isEndDate(day, leftcalendar.focusedMonth, leftcalendar
+                                            .focusedYear),
+                                        'fi-in-range': isInRange(day, leftcalendar.focusedMonth, leftcalendar
+                                            .focusedYear),
+                                        'fi-disabled': dayIsDisabled(day, leftcalendar.focusedMonth, leftcalendar
+                                            .focusedYear),
                                     }"
                                     class="fi-fo-ndtr-picker-calendar-day"></div>
                             </template>
@@ -155,7 +163,8 @@
 
                     <div class="fi-fo-ndtr-picker-range-calendar-section">
                         <div class="fi-fo-ndtr-picker-range-calendar-section-header">
-                            <button x-show="isEndPrevActive" x-cloak type="button" x-on:click="focusPreviousMonth()">
+                            <button x-show="rightcalendar.isPrevActive" x-cloak type="button"
+                                x-on:click="rightcalendar.focusPreviousMonth()">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -163,19 +172,20 @@
                                 </svg>
                             </button>
 
-                            <select x-model="endFocusedMonth" class="fi-fo-ndtr-picker-select">
+                            <select x-model="rightcalendar.focusedMonth" class="fi-fo-ndtr-picker-select">
                                 <template x-for="(month, index) in months">
                                     <option x-bind:value="index + 1" x-text="month"></option>
                                 </template>
                             </select>
 
-                            <select x-model="endFocusedYear" class="fi-fo-ndtr-picker-select">
+                            <select x-model="rightcalendar.focusedYear" class="fi-fo-ndtr-picker-select">
                                 <template x-for="year in years">
                                     <option x-bind:value="year" x-text="toNumber(year)"></option>
                                 </template>
                             </select>
 
-                            <button x-show="isEndNextActive" x-cloak type="button" x-on:click="focusNextMonth()">
+                            <button x-show="rightcalendar.isNextActive" x-cloak type="button"
+                                x-on:click="rightcalendar.focusNextMonth()">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -189,19 +199,27 @@
                             </template>
                         </div>
                         <div role="grid" class="fi-fo-ndtr-picker-calendar">
-                            <template x-for="day in emptyDaysInEndFocusedMonth" x-bind:key="day">
+                            <template x-for="day in rightcalendar.emptyDaysInFocusedMonth"
+                                x-bind:key="day">
                                 <div></div>
                             </template>
 
-                            <template x-for="day in daysInEndFocusedMonth" x-bind:key="day">
-                                <div x-text="toNumber(day)" x-on:click="!dayIsDisabled(day) && selectDate(day)"
-                                    x-on:mouseenter="setFocusedDay(day)" role="option"
-                                    x-bind:aria-selected="focusedDate.day() === day"
+                            <template x-for="day in rightcalendar.daysInFocusedMonth" x-bind:key="day">
+                                <div x-text="toNumber(day)"
+                                    x-on:click="!dayIsDisabled(day,rightcalendar.focusedMonth,rightcalendar.focusedYear) && rightcalendar.selectDate(day)"
+                                    x-on:mouseenter="rightcalendar.setFocusedDay(day)" role="option"
                                     x-bind:class="{
-                                        'fi-fo-ndtr-picker-calendar-day-today': dayIsToday(day),
-                                        'fi-focused': focusedDate.day() === day,
-                                        'fi-selected': dayIsSelected(day),
-                                        'fi-disabled': dayIsDisabled(day),
+                                        'fi-fo-ndtr-picker-calendar-day-today': rightcalendar.dayIsToday(day),
+                                        'fi-start': isStartDate(day, rightcalendar.focusedMonth, rightcalendar
+                                            .focusedYear),
+                                        'fi-focused': isDateFocused(day, rightcalendar.focusedMonth, rightcalendar
+                                            .focusedYear),
+                                        'fi-end': isEndDate(day, rightcalendar.focusedMonth, rightcalendar.focusedYear),
+                                        'fi-in-range': isInRange(day, rightcalendar.focusedMonth, rightcalendar
+                                            .focusedYear),
+                                    
+                                        'fi-disabled': dayIsDisabled(day, rightcalendar.focusedMonth, rightcalendar
+                                            .focusedYear),
                                     }"
                                     class="fi-fo-ndtr-picker-calendar-day"></div>
                             </template>
@@ -213,84 +231,6 @@
                     //here is apply button, cancel button and selected date range display
                 </div>
 
-
-
-                {{-- <div class="fi-fo-date-time-picker-panel-header">
-                    <button x-show="isPrevActive" x-cloak type="button" x-on:click="focusPreviousMonth()">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-
-                    <select x-model="focusedMonth" class=".fi-fo-ndtr-picker-select">
-                        <template x-for="(month, index) in months">
-                            <option x-bind:value="index + 1" x-text="month"></option>
-                        </template>
-                    </select>
-
-                    <select x-model="focusedYear" class=".fi-fo-ndtr-picker-select">
-                        <template x-for="year in years">
-                            <option x-bind:value="year" x-text="toNumber(year)"></option>
-                        </template>
-                    </select>
-
-                    <button x-show="isNextActive" x-cloak type="button" x-on:click="focusNextMonth()">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.2rem; width:1.2rem;" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-
-                </div> --}}
-
-                {{-- <div class="fi-fo-date-time-picker-calendar-header">
-                    <template x-for="(day, index) in dayLabels" x-bind:key="index">
-                        <div x-text="day" class="fi-fo-date-time-picker-calendar-header-day"></div>
-                    </template>
-                </div> --}}
-
-                {{-- <div role="grid" class="fi-fo-date-time-picker-calendar">
-                    <template x-for="day in emptyDaysInFocusedMonth" x-bind:key="day">
-                        <div></div>
-                    </template>
-
-                    <template x-for="day in daysInFocusedMonth" x-bind:key="day">
-                        <div x-text="toNumber(day)" x-on:click="!dayIsDisabled(day) && selectDate(day)"
-                            x-on:mouseenter="setFocusedDay(day)" role="option"
-                            x-bind:aria-selected="focusedDate.day() === day"
-                            x-bind:class="{
-                                'fi-fo-date-time-picker-calendar-day-today': dayIsToday(day),
-                                'fi-focused': focusedDate.day() === day,
-                                'fi-selected': dayIsSelected(day),
-                                'fi-disabled': dayIsDisabled(day),
-                            }"
-                            class="fi-fo-date-time-picker-calendar-day"></div>
-                    </template>
-                </div>
-
-                @if ($hasTime)
-                    <div class="fi-fo-date-time-picker-time-inputs">
-                        <input max="23" min="0" step="{{ $getHoursStep() }}" type="number"
-                            inputmode="numeric" x-model.debounce="hour" />
-
-                        <span class="fi-fo-date-time-picker-time-input-separator">
-                            :
-                        </span>
-
-                        <input max="59" min="0" step="{{ $getMinutesStep() }}" type="number"
-                            inputmode="numeric" x-model.debounce="minute" />
-
-                        @if ($hasSeconds)
-                            <span class="fi-fo-date-time-picker-time-input-separator">
-                                :
-                            </span>
-
-                            <input max="59" min="0" step="{{ $getSecondsStep() }}" type="number"
-                                inputmode="numeric" x-model.debounce="second" />
-                        @endif
-                    </div>
-                @endif --}}
             </div>
         </div>
     </x-filament::input.wrapper>

@@ -1,6 +1,105 @@
 import nepalidayjs from 'nepali-day-js'
 import { localenumber } from 'nepali-day-js/locale'
 
+function basicNepaliCalendar({
+    defaultFocusedDate,
+    firstDayOfWeek,
+    disableNavWhenOutOfRange,
+}) {
+    return {
+        daysInFocusedMonth: [],
+        emptyDaysInFocusedMonth: [],
+        focusedDate: null,
+        focusedMonth: null,
+        focusedYear: null,
+        isPrevActive: true,
+        isNextActive: true,
+        defaultFocusedDate,
+        disableNavWhenOutOfRange,
+        actions: {},
+
+        setUp() {
+            const defaultDate = this.getDefaultFocusedDate() ?? nepalidayjs()
+            this.focusedMonth = defaultDate.month()
+            this.focusedYear = defaultDate.year()
+        },
+
+        afterHydated() {},
+
+        focusedMonthUpdated() {
+            this.setupDaysGrid()
+        },
+
+        focusedYearUpdated() {
+            this.setupDaysGrid()
+        },
+
+        setupDaysGrid() {
+            if (this.focusedMonth === null || this.focusedYear === null) return
+            const date = nepalidayjs()
+                .year(this.focusedYear)
+                .month(this.focusedMonth)
+                .day(1)
+            this.emptyDaysInFocusedMonth = Array.from(
+                {
+                    length: date.day(8 - firstDayOfWeek).dayOfWeek(),
+                },
+                (_, i) => i + 1,
+            )
+            this.daysInFocusedMonth = Array.from(
+                { length: date.daysInMonth() },
+                (_, i) => i + 1,
+            )
+        },
+
+        getDefaultFocusedDate() {
+            if (this.defaultFocusedDate === null) return null
+            const date = nepalidayjs(this.defaultFocusedDate)
+            return date.isValid() ? date : null
+        },
+
+        focusPreviousMonth() {
+            if (this.focusedMonth === 1) {
+                this.focusedMonth = 12
+                this.focusedYear--
+            } else {
+                this.focusedMonth--
+            }
+        },
+
+        focusNextMonth() {
+            if (this.focusedMonth === 12) {
+                this.focusedMonth = 1
+                this.focusedYear++
+            } else {
+                this.focusedMonth++
+            }
+        },
+
+        dayIsToday(day) {
+            let date = nepalidayjs()
+            return (
+                date.day() === day &&
+                date.month() === this.focusedMonth &&
+                date.year() === this.focusedYear
+            )
+        },
+
+        setFocusedDay(day) {
+            this.actions.setFocusedDate(
+                day,
+                this.focusedMonth,
+                this.focusedYear,
+            )
+        },
+
+        selectDate(day) {
+            this.setFocusedDay(day)
+            this.actions.selectDate()
+        },
+    }
+}
+
 export default function dateTimeRangePickerFormComponent({
     linkedcalendars,
     displayFormat,
@@ -13,53 +112,35 @@ export default function dateTimeRangePickerFormComponent({
     state,
 }) {
     return {
-        daysInStartFocusedMonth: [],
-
-        daysInEndFocusedMonth: [],
-
-        emptyDaysInStartFocusedMonth: [],
-
-        emptyDaysInEndFocusedMonth: [],
-
         displayText: '',
-
-        startFocusedDate: null,
-
-        focusedDate: null,
-
-        startFocusedMonth: null,
-
-        endFocusedMonth: null,
-
-        startFocusedYear: null,
-
-        endFocusedYear: null,
 
         isClearingState: false,
 
-        isStartPrevActive: true,
+        leftcalendar: basicNepaliCalendar({
+            firstDayOfWeek,
+            defaultFocusedDate: null,
+            disableNavWhenOutOfRange,
+            actions: {
+                setFocusedDate: this.setFocusedDate,
+                selectDate: this.selectDate,
+            },
+        }),
 
-        isEndPrevActive: true,
+        rightcalendar: basicNepaliCalendar({
+            firstDayOfWeek,
+            defaultFocusedDate: null,
+            disableNavWhenOutOfRange,
+            actions: {
+                setFocusedDate: this.setFocusedDate,
+                selectDate: this.selectDate,
+            },
+        }),
 
-        isStartNextActive: true,
+        startDate: null,
 
-        isEndNextActive: true,
+        endDate: null,
 
-        startHour: null,
-
-        endHour: null,
-
-        startMinute: null,
-
-        endMinute: null,
-
-        startSecond: null,
-
-        endSecond: null,
-
-        startMeridian: null,
-
-        endMeridian: null,
+        focusedDate: null,
 
         state,
 
@@ -71,63 +152,22 @@ export default function dateTimeRangePickerFormComponent({
 
         init() {
             this.$nextTick(() => {
-                let date =
-                    this.getDefaultStartFocusedDate() ??
-                    nepalidayjs().sub(1, 'month')
-                this.startFocusedMonth ??= date.month()
-                this.startFocusedYear ??= date.year()
-
-                this.endFocusedDate ??=
-                    this.getDefaultEndFocusedDate() ?? nepalidayjs()
-                this.endFocusedMonth ??= this.endFocusedDate.month()
-                this.endFocusedYear ??= this.endFocusedDate.year()
+                this.leftcalendar.setUp()
+                this.rightcalendar.setUp()
+                this.focusedDate = nepalidayjs()
             })
-
-            let startDate =
-                this.getSelectedStartDate() ??
-                this.getDefaultStartFocusedDate() ??
-                nepalidayjs().sub(1, 'month')
-
-            let endDate =
-                this.getSelectedEndDate() ??
-                this.getDefaultEndFocusedDate() ??
-                nepalidayjs()
-
-            if (!this.dateIsInRange(startDate)) {
-                startDate = null
+            this.leftcalendar.actions = {
+                setFocusedDate: this.setFocusedDate.bind(this),
+                selectDate: this.selectDate.bind(this),
             }
-            if (!this.dateIsInRange(endDate)) {
-                endDate = null
+            this.rightcalendar.actions = {
+                setFocusedDate: this.setFocusedDate.bind(this),
+                selectDate: this.selectDate.bind(this),
             }
 
-            this.startHour = startDate?.hour() ?? 0
-            this.startMinute = startDate?.minute() ?? 0
-            this.startSecond = startDate?.second() ?? 0
-
-            this.endHour = endDate?.hour() ?? 0
-            this.endMinute = endDate?.minute() ?? 0
-            this.endSecond = endDate?.second() ?? 0
-
-            if (is12HourFormat) {
-                if (this.startHour >= 12) {
-                    this.startMeridian = 'pm'
-                    if (this.startHour > 12) this.startHour -= 12
-                } else {
-                    this.startMeridian = 'am'
-                    this.startHour = this.startHour === 0 ? 1 : this.startHour
-                }
-                if (this.endHour >= 12) {
-                    this.endMeridian = 'pm'
-                    if (this.endHour > 12) this.endHour -= 12
-                } else {
-                    this.endMeridian = 'am'
-                    this.endHour = this.endHour === 0 ? 1 : this.endHour
-                }
-            }
             this.setMonths()
             this.setYears()
             this.setDayLabels()
-            // this.setDisplayText()
 
             if (isAutofocused) {
                 this.$nextTick(() =>
@@ -135,57 +175,20 @@ export default function dateTimeRangePickerFormComponent({
                 )
             }
 
-            // this.$watch('focusedMonth', () => {
-            //     this.focusedMonth = +this.focusedMonth
+            this.$watch('leftcalendar.focusedMonth', () => {
+                this.leftcalendar.focusedMonthUpdated()
+            })
+            this.$watch('rightcalendar.focusedMonth', () => {
+                this.rightcalendar.focusedMonthUpdated()
+            })
 
-            //     if (this.focusedDate.month() === this.focusedMonth) {
-            //         return
-            //     }
+            this.$watch('leftcalendar.focusedYear', () => {
+                this.leftcalendar.focusedYearUpdated()
+            })
 
-            //     this.focusedDate = this.focusedDate.month(this.focusedMonth)
-            // })
-
-            // this.$watch('focusedYear', () => {
-            //     if (this.focusedYear?.length > 4) {
-            //         this.focusedYear = this.focusedYear.substring(0, 4)
-            //     }
-
-            //     if (!this.focusedYear || this.focusedYear?.length !== 4) {
-            //         return
-            //     }
-
-            //     let year = +this.focusedYear
-
-            //     if (!Number.isInteger(year)) {
-            //         year = nepalidayjs().year()
-
-            //         this.focusedYear = year
-            //     }
-
-            //     if (this.focusedDate.year() === year) {
-            //         return
-            //     }
-
-            //     this.focusedDate = this.focusedDate.year(year)
-            // })
-
-            // this.$watch('focusedDate', () => {
-            //     let month = this.focusedDate.month()
-            //     let year = this.focusedDate.year()
-
-            //     if (this.focusedMonth !== month) {
-            //         this.focusedMonth = month
-            //     }
-
-            //     if (this.focusedYear !== year) {
-            //         this.focusedYear = year
-            //     }
-
-            //     if (disableNavWhenOutOfRange) {
-            //         this.checkDateRange()
-            //     }
-            //     this.setupDaysGrid()
-            // })
+            this.$watch('rightcalendar.focusedYear', () => {
+                this.rightcalendar.focusedYearUpdated()
+            })
 
             // this.$watch('hour', () => {
             //     let hour = +this.hour
@@ -337,201 +340,107 @@ export default function dateTimeRangePickerFormComponent({
             return false
         },
 
-        dateIsInRange(date) {
+        dayIsDisabled(day, month, year) {
+            const min = this.getMinDate()
+            const max = this.getMaxDate()
+            if (max) {
+                if (
+                    year > max.year() ||
+                    (year === max.year() && month > max.month()) ||
+                    (year === max.year() &&
+                        month === max.month() &&
+                        day > max.date())
+                ) {
+                    return true
+                }
+            }
+            if (min) {
+                if (
+                    year < min.year() ||
+                    (year === min.year() && month < min.month()) ||
+                    (year === min.year() &&
+                        month === min.month() &&
+                        day < min.date())
+                ) {
+                    return true
+                }
+            }
+            return false
+        },
+
+        isStartDate(day, month, year) {
+            if (this.startDate === null) return false
+            return (
+                this.startDate.day() === day &&
+                this.startDate.month() === month &&
+                this.startDate.year() === year
+            )
+        },
+
+        isEndDate(day, month, year) {
+            if (this.endDate === null) return false
+            return (
+                this.endDate.day() === day &&
+                this.endDate.month() === month &&
+                this.endDate.year() === year
+            )
+        },
+
+        isDateFocused(day, month, year) {
+            if (this.focusedDate === null) return false
+            return (
+                this.focusedDate.day() === day &&
+                this.focusedDate.month() === month &&
+                this.focusedDate.year() === year
+            )
+        },
+
+        isInRange(day, month, year) {
             if (
-                this.getMaxDate() !== null &&
-                date?.isAfter(this.getMaxDate())
+                this.startDate === null ||
+                (this.endDate === null && this.focusedDate === null)
             ) {
                 return false
             }
-            if (
-                this.getMinDate() !== null &&
-                date?.isBefore(this.getMinDate())
-            ) {
-                return false
-            }
-            return true
-        },
-
-        startDayIsDisabled(day) {
-            this.startFocusedDate ??= nepalidayjs().sub(1, 'month')
-
-            return this.dateIsDisabled(this.startFocusedDate.day(day))
-        },
-
-        endDayIsDisabled(day) {
-            this.endFocusedDate ??= nepalidayjs().sub(1, 'month')
-
-            return this.dateIsDisabled(this.endFocusedDate.day(day))
-        },
-
-        startDayIsSelected(day) {
-            let selectedDate = this.getSelectedDate()
-
-            if (selectedDate === null) {
-                return false
-            }
-
-            this.startFocusedDate ??= nepalidayjs().sub(1, 'month')
-
+            const date = this.focusedDate.year(year).month(month).day(day)
             return (
-                selectedDate.day() === day &&
-                selectedDate.month() === this.startFocusedDate.month() &&
-                selectedDate.year() === this.startFocusedDate.year()
+                date.isAfter(this.startDate) &&
+                (this.endDate !== null
+                    ? date.isBefore(this.endDate)
+                    : date.isBefore(this.focusedDate))
             )
         },
 
-        endDayIsSelected(day) {
-            let selectedDate = this.getSelectedDate()
-
-            if (selectedDate === null) {
-                return false
-            }
-
-            this.startFocusedDate ??= nepalidayjs().sub(1, 'month')
-
-            return (
-                selectedDate.day() === day &&
-                selectedDate.month() === this.startFocusedDate.month() &&
-                selectedDate.year() === this.startFocusedDate.year()
-            )
-        },
-
-        dayIsToday(day) {
-            let date = nepalidayjs()
-            this.focusedDate ??= date
-
-            return (
-                date.day() === day &&
-                date.month() === this.focusedDate.month() &&
-                date.year() === this.focusedDate.year()
-            )
-        },
+        // dateIsInRange(date) {
+        //     if (
+        //         this.getMaxDate() !== null &&
+        //         date?.isAfter(this.getMaxDate())
+        //     ) {
+        //         return false
+        //     }
+        //     if (
+        //         this.getMinDate() !== null &&
+        //         date?.isBefore(this.getMinDate())
+        //     ) {
+        //         return false
+        //     }
+        //     return true
+        // },
 
         focusPreviousDay() {
             this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.subtract(1, 'day'))
-            ) {
-                return
-            }
+            // if (
+            //     disableNavWhenOutOfRange &&
+            //     !this.dateIsInRange(this.focusedDate.subtract(1, 'day'))
+            // ) {
+            //     return
+            // }
             this.focusedDate.subDay()
-        },
-
-        focusPreviousWeek() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.subtract(1, 'week'))
-            ) {
-                return
-            }
-            this.focusedDate.subWeek()
-        },
-
-        focusPreviousMonth() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.subtract(1, 'month'))
-            ) {
-                return
-            }
-
-            this.focusedDate.subMonth()
-        },
-
-        focusPreviousYear() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.subtract(1, 'year'))
-            ) {
-                return
-            }
-
-            this.focusedDate.subYear()
         },
 
         focusNextDay() {
             this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.add(1, 'day'))
-            ) {
-                return
-            }
-
             this.focusedDate.addDay()
-        },
-
-        focusNextWeek() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.add(1, 'week'))
-            ) {
-                return
-            }
-            this.focusedDate.addWeek()
-        },
-
-        focusNextMonth() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.add(1, 'month'))
-            ) {
-                return
-            }
-
-            this.focusedDate.addMonth()
-        },
-
-        focusNextYear() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(this.focusedDate.add(1, 'year'))
-            ) {
-                return
-            }
-
-            this.focusedDate.addYear()
-        },
-
-        focusStartOfWeek() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(
-                    this.focusedDate.subtract(
-                        this.focusedDate.dayOfWeek() - 1,
-                        'week',
-                    ),
-                )
-            ) {
-                return
-            }
-
-            this.focusedDate.subDays(this.focusedDate.dayOfWeek() - 1)
-        },
-        focusEndOfWeek() {
-            this.focusedDate ??= nepalidayjs()
-            if (
-                disableNavWhenOutOfRange &&
-                !this.dateIsInRange(
-                    this.focusedDate.add(
-                        7 - this.focusedDate.dayOfWeek(),
-                        'week',
-                    ),
-                )
-            ) {
-                return
-            }
-
-            this.focusedDate.addDays(7 - this.focusedDate.dayOfWeek())
         },
 
         getDayLabels() {
@@ -565,81 +474,47 @@ export default function dateTimeRangePickerFormComponent({
             return date
         },
 
-        getSelectedDate() {
-            if (this.state === undefined) {
-                return null
-            }
-
-            if (this.state === null) {
-                return null
-            }
-            let date = nepalidayjs(this.state)
-
-            if (!date.isValid()) {
-                return null
-            }
-
-            return date
-        },
-
-        getDefaultStartFocusedDate() {
-            if (this.defaultStartFocusedDate === null) {
-                return null
-            }
-
-            let defaultFocusedDate = nepalidayjs(this.defaultStartFocusedDate)
-            if (!defaultFocusedDate.isValid()) {
-                return null
-            }
-
-            return defaultFocusedDate
-        },
-
-        getDefaultEndFocusedDate() {
-            if (this.defaultEndFocusedDate === null) {
-                return null
-            }
-
-            let defaultFocusedDate = nepalidayjs(this.defaultEndFocusedDate)
-            if (!defaultFocusedDate.isValid()) {
-                return null
-            }
-
-            return defaultFocusedDate
-        },
-
         togglePanelVisibility() {
             if (!this.isOpen()) {
-                this.focusedDate =
-                    this.getSelectedDate() ??
-                    this.focusedDate ??
-                    this.getMinDate() ??
-                    nepalidayjs()
-
-                this.setupDaysGrid()
+                this.leftcalendar.setupDaysGrid()
+                this.rightcalendar.setupDaysGrid()
             }
 
             this.$refs.panel.toggle(this.$refs.button)
         },
 
-        selectDate(day = null) {
-            if (day) {
-                this.setFocusedDay(day)
+        selectDate() {
+            if (
+                this.startDate === null ||
+                (this.startDate !== null && this.endDate !== null)
+            ) {
+                this.startDate = nepalidayjs(this.focusedDate)
+                this.endDate = null
+            } else if (this.startDate !== null && this.endDate === null) {
+                if (this.focusedDate.isBefore(this.startDate)) {
+                    this.endDate = nepalidayjs(this.startDate)
+                    this.startDate = nepalidayjs(this.focusedDate)
+                } else {
+                    this.endDate = nepalidayjs(this.focusedDate)
+                }
             }
+            this.setDisplayText()
+            //here set state and displaey text
+            // this.setState(this.startDate, this.endDate)
 
-            this.focusedDate ??= nepalidayjs()
-
-            this.setState(this.focusedDate)
-
-            if (shouldCloseOnDateSelection) {
-                this.togglePanelVisibility()
-            }
+            // if (shouldCloseOnDateSelection) {
+            //     this.togglePanelVisibility()
+            // }
         },
 
         setDisplayText() {
-            this.displayText = this.getSelectedDate()
-                ? this.getSelectedDate().setLocale(locale).format(displayFormat)
-                : ''
+            // this.displayText = this.state
+            //     ? this.getSelectedDate().setLocale(locale).format(displayFormat)
+            //     : ''
+            this.displayText =
+                this.startDate?.setLocale(locale).format(displayFormat) +
+                ' - ' +
+                this.endDate?.setLocale(locale).format(displayFormat)
         },
 
         setYears() {
@@ -647,6 +522,13 @@ export default function dateTimeRangePickerFormComponent({
                 { length: nepalidayjs.maxYear() - nepalidayjs.minYear() + 1 },
                 (_, i) => nepalidayjs.minYear() + i,
             )
+        },
+
+        setFocusedDate(day, month, year) {
+            this.focusedDate = (this.focusedDate ?? nepalidayjs())
+                .day(day)
+                .year(year)
+                .month(month)
         },
 
         setMonths() {
@@ -668,29 +550,6 @@ export default function dateTimeRangePickerFormComponent({
             if (!this.dateIsInRange(prevMonthDate)) {
                 this.isPrevActive = false
             }
-        },
-
-        setupDaysGrid() {
-            this.focusedDate ??= nepalidayjs()
-
-            this.emptyDaysInFocusedMonth = Array.from(
-                {
-                    length: this.focusedDate
-                        .day(8 - firstDayOfWeek)
-                        .dayOfWeek(),
-                },
-                (_, i) => i + 1,
-            )
-            this.daysInFocusedMonth = Array.from(
-                {
-                    length: this.focusedDate.daysInMonth(),
-                },
-                (_, i) => i + 1,
-            )
-        },
-
-        setFocusedDay(day) {
-            this.focusedDate = (this.focusedDate ?? nepalidayjs()).day(day)
         },
 
         setState(date) {
