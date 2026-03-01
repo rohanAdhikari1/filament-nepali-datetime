@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": "^8.2",
-        "filament/forms": "^4.0",
-        "filament/infolists": "^4.0",
-        "filament/tables": "^4.0",
+        "filament/forms": "~5.0",
+        "filament/infolists": "~5.0",
+        "filament/tables": "~5.0",
         "rohanadhikari/nepali-date": "^0.0.4"
     },
     "require-dev": {
