@@ -8,6 +8,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
 use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
+use RohanAdhikari\NepaliDate\Laravel\Validation\NepaliDateRule;
 use RohanAdhikari\NepaliDate\NepaliDate;
 
 class NepaliDatetimePicker extends DateTimePicker
@@ -25,6 +26,16 @@ class NepaliDatetimePicker extends DateTimePicker
     protected bool | Closure $disableNavWhenOutOfRange = true;
 
     protected bool $useTime12HourFormat = false;
+
+    protected function setUp(): void
+    {
+        $parent = get_parent_class(parent::class);
+        $parent::setUp();
+        $this->rule(
+            new NepaliDateRule,
+            static fn(DateTimePicker $component): bool => $component->hasDate(),
+        );
+    }
 
     /**
      * @return array<StateCast>
