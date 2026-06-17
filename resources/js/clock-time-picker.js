@@ -419,8 +419,9 @@ export default function clockTimePickerFormComponent({
                 return
             }
             this.view = view
-            this.updateHandAngle()
-            this.reFocusInput()
+            this.$nextTick(() => {
+                this.updateHandAngle()
+            })
         },
 
         resetView() {

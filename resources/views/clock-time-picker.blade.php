@@ -108,7 +108,7 @@
 
                 <div class="fi-fo-nepali-clock-time-picker-clock-wrapper">
                     <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock">
-                        <template x-if="view === 'hour'">
+                        <div x-show="view === 'hour'" x-transition>
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="h in getLength(12, 1)" x-bind:key="h">
@@ -122,8 +122,8 @@
                                     </div>
                                 </template>
                             </div>
-                        </template>
-                        <template x-if="view === 'minute'">
+                        </div>
+                        <div x-show="view === 'minute'" x-transition>
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="m in getLength(60, 0)" x-bind:key="m">
@@ -137,9 +137,9 @@
                                     </div>
                                 </template>
                             </div>
-                        </template>
+                        </div>
 
-                        <template x-if="view === 'second'">
+                        <div x-show="view === 'second'" x-transition>
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="s in getLength(60, 0)" x-bind:key="s">
@@ -153,7 +153,7 @@
                                     </div>
                                 </template>
                             </div>
-                        </template>
+                        </div>
 
                         <div class="fi-fo-nepali-clock-time-picker-clock-hand" @pointerdown.prevent="isDragging = true"
                             @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false"
