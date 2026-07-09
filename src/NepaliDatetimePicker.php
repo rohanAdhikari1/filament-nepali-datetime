@@ -8,7 +8,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
 use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
-use RohanAdhikari\NepaliDate\Laravel\Validation\NepaliDateRule;
+use RohanAdhikari\NepaliDate\Laravel\ValidationRule\NepaliDateRule;
 use RohanAdhikari\NepaliDate\NepaliDate;
 
 class NepaliDatetimePicker extends DateTimePicker
