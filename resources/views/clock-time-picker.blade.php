@@ -107,7 +107,17 @@
                 </div>
 
                 <div class="fi-fo-nepali-clock-time-picker-clock-wrapper">
-                    <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock">
+                    <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock"
+                        @dblclick.prevent="!isDragging && focusNextView(true)"
+                        @pointerdown.prevent="onDragClockHand($event); isDragging = true"
+                        @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false">
+                        <div class="fi-fo-nepali-clock-time-picker-clock-hand"
+                            :style="{ transform: `translate(-50%, -100%) rotate(${handangle}deg)` }">
+                            <div class="fi-fo-nepali-clock-time-picker-hand-indicator"></div>
+                        </div>
+                        <div class="fi-fo-nepali-clock-time-picker-clock-center-dot"></div>
+
+
                         <div x-show="view === 'hour'" x-transition>
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
@@ -155,12 +165,7 @@
                             </div>
                         </div>
 
-                        <div class="fi-fo-nepali-clock-time-picker-clock-hand" @pointerdown.prevent="isDragging = true"
-                            @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false"
-                            :style="{ transform: `translate(-50%, -100%) rotate(${handangle}deg)` }">
-                            <div class="fi-fo-nepali-clock-time-picker-hand-indicator"></div>
-                        </div>
-                        <div class="fi-fo-nepali-clock-time-picker-clock-center-dot"></div>
+
                     </div>
 
                     <div class="fi-fo-nepali-clock-time-picker-clock-meridian">

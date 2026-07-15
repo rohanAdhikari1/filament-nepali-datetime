@@ -293,6 +293,7 @@ export default function clockTimePickerFormComponent({
             const y = 50 - radiusPercent * Math.cos(rad)
             return `left: ${x}%; top: ${y}%; transform: translate(-50%, -50%);`
         },
+
         togglePanelVisibility() {
             if (!this.view) {
                 this.view = defaultView ?? 'hour'
@@ -411,6 +412,7 @@ export default function clockTimePickerFormComponent({
 
         setMeridian(meridian) {
             this.meridian = meridian
+            this.selectTime()
             this.reFocusInput()
         },
 
