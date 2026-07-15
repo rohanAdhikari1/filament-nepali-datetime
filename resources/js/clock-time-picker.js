@@ -7,6 +7,7 @@ export default function clockTimePickerFormComponent({
     defaultView,
     isAutofocused,
     locale,
+    minutesStep = 1,
     shouldCloseOnTimeSelection,
     state,
 }) {
@@ -24,6 +25,8 @@ export default function clockTimePickerFormComponent({
         second: null,
 
         meridian: null,
+
+        minutesStep: minutesStep && minutesStep > 0 ? minutesStep : 1,
 
         state,
 
@@ -86,6 +89,7 @@ export default function clockTimePickerFormComponent({
             let [hour, minute, second] = timeArray
             let meridian = hour >= 12 ? 'PM' : 'AM'
             hour = hour % 12 || 12
+
             const replacements = {
                 HH: String(timeArray[0]).padStart(2, '0'),
                 H: String(timeArray[0]),
@@ -95,26 +99,26 @@ export default function clockTimePickerFormComponent({
                 m: String(minute),
                 ss: String(second).padStart(2, '0'),
                 s: String(second),
-                A: meridian,
+                A: this.meridianLabels
+                    ? meridian === 'PM'
+                        ? this.meridianLabels.pm
+                        : this.meridianLabels.am
+                    : meridian,
                 a: meridian.toLowerCase(),
             }
 
-            let formatted = format
-            Object.keys(replacements).forEach((token) => {
-                formatted = formatted.replace(
-                    new RegExp(token, 'g'),
-                    replacements[token],
-                )
-            })
-            return formatted
+            const tokenPattern = /HH|H|hh|h|mm|m|ss|s|A|a/g
+
+            return format.replace(tokenPattern, (token) => replacements[token])
         },
 
         clearState() {
             this.setState(null)
-            this.hour = 1
+            this.hour = 12
             this.minute = 0
             this.second = 0
             this.meridian = 'AM'
+            this.updateHandAngle()
         },
 
         onDragClockHand(e) {
@@ -128,14 +132,22 @@ export default function clockTimePickerFormComponent({
             if (angle < 0) angle += 360
             const step = 360 / this.getCurrentUnitMax()
             let unitValue = Math.round(angle / step) % this.getCurrentUnitMax()
+
+            if (this.view === 'minute' && this.minutesStep > 1) {
+                unitValue =
+                    Math.round(unitValue / this.minutesStep) * this.minutesStep
+                unitValue = unitValue % 60
+            }
+
             this.setCurrentUnitValue(unitValue)
         },
 
         findNextEnabled(unit, direction = 1) {
             const max = this.getCurrentUnitMax()
+            const stepSize = unit === 'minute' ? this.minutesStep : 1
             let value = this.getCurrentUnitValue()
-            for (let i = 0; i < max; i++) {
-                value = (value + direction + max) % max
+            for (let i = 0; i < max; i += stepSize) {
+                value = (value + direction * stepSize + max) % max
                 const testTime = [...this.getSelectedTimeArray()]
                 if (unit === 'hour') {
                     const meridian = this.meridian?.toUpperCase()
