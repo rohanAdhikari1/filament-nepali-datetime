@@ -3,7 +3,6 @@
 namespace RohanAdhikari\FilamentNepaliDatetime;
 
 use Carbon\CarbonInterface;
-use Carbon\Exceptions\InvalidFormatException;
 use Closure;
 use DateTime;
 use Filament\Forms\Components\Concerns\CanBeReadOnly;
@@ -15,7 +14,6 @@ use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\Contracts\HasAffixActions;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Facades\FilamentTimezone;
-use Illuminate\Support\Carbon;
 use Illuminate\View\ComponentAttributeBag;
 use RohanAdhikari\FilamentNepaliDatetime\StateCasts\NepaliDateTimeStateCast;
 use RohanAdhikari\NepaliDate\Exceptions\NepaliDateFormatException;
@@ -60,6 +58,8 @@ class ClockTimePicker extends Field implements HasAffixActions
      * @var array<DateTime | NepaliDate | string> | Closure
      */
     protected array | Closure $disabledTimes = [];
+
+    protected int | null $minutesStep = null;
 
     public function getDefaultStateCasts(): array
     {
@@ -172,6 +172,17 @@ class ClockTimePicker extends Field implements HasAffixActions
         $this->shouldCloseOnTimeSelection = $condition;
 
         return $this;
+    }
+
+    public function minutesStep(int $step): static
+    {
+        $this->minutesStep = $step;
+        return $this;
+    }
+
+    public function getMinutesStep(): int
+    {
+        return $this->minutesStep ?? 1;
     }
 
     /**

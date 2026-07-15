@@ -18,7 +18,7 @@
             }
 
             & .fi-fo-nepali-clock-time-picker-panel-header-tag {
-                @apply rounded-md p-2;
+                @apply rounded-md p-2 transition-colors duration-100;
 
                 &.fi-disabled {
                     @apply pointer-events-none opacity-50;
@@ -45,7 +45,7 @@
             @apply w-48 h-48 flex justify-center items-center relative rounded-full border border-gray-950/5 dark:border-white/10;
 
             & .fi-fo-nepali-clock-time-picker-clock-tag {
-                @apply absolute select-none p-1 rounded-full z-20 cursor-pointer;
+                @apply absolute select-none p-1 rounded-full z-20 cursor-pointer transition-colors duration-100;
                 aspect-ratio: 1 / 1;
 
                 &.fi-disabled {
@@ -53,13 +53,12 @@
                 }
 
                 &.fi-selected {
-                    @apply text-sm pointer-events-none dark:bg-gray-950/5 bg-white/5;
+                    @apply text-sm text-white pointer-events-none bg-primary-600 dark:bg-primary-500;
                 }
 
-                /* 
-                &.fi-focused:not(.fi-selected):not(.fi-disabled) {
-                    @apply text-primary-600 dark:text-primary-400 bg-gray-50 dark:bg-white/5;
-                } */
+                &:not(.fi-selected):not(.fi-disabled):hover {
+                    @apply bg-gray-100 dark:bg-white/10;
+                }
             }
         }
 
@@ -67,7 +66,7 @@
             @apply flex justify-between;
 
             & .fi-fo-nepali-clock-time-picker-clock-meridian-tag {
-                @apply rounded-full p-2;
+                @apply rounded-full p-2 transition-colors duration-100;
 
                 &.fi-disabled {
                     @apply pointer-events-none opacity-50;

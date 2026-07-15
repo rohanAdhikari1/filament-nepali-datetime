@@ -27,6 +27,7 @@
     $isRequired = $isRequired();
     $isConcealed = $isConcealed();
     $livewireKey = $getLivewireKey();
+    $minutesStep = $getMinutesStep();
 @endphp
 <x-dynamic-component :component="$fieldWrapperView" :field="$field" :inline-label-vertical-alignment="\Filament\Support\Enums\VerticalAlignment::Center">
     <x-filament::input.wrapper :disabled="$isDisabled" :inline-prefix="$isPrefixInline" :inline-suffix="$isSuffixInline" :prefix="$prefixLabel" :prefix-actions="$prefixActions"
@@ -43,6 +44,7 @@
                 defaultView: @js(null),
                 isAutofocused: @js($isAutofocused),
                 locale: @js($getLocale()),
+                minutesStep: @js($minutesStep),
                 shouldCloseOnTimeSelection: @js($shouldCloseOnTimeSelection()),
                 state: $wire.{{ $applyStateBindingModifiers("\$entangle('{$statePath}')") }},
             })" wire:ignore
@@ -71,17 +73,19 @@
                 x-on:keydown.backspace.prevent.stop="if (! $el.disabled) clearState()"
                 x-on:keydown.clear.prevent.stop="if (! $el.disabled) clearState()"
                 x-on:keydown.delete.prevent.stop="if (! $el.disabled) clearState()" aria-label="{{ $placeholder }}"
-                type="button" tabindex="-1" @disabled($isDisabled || $isReadOnly)
+                aria-haspopup="dialog" x-bind:aria-expanded="isOpen() ? 'true' : 'false'" type="button" tabindex="-1"
+                @disabled($isDisabled || $isReadOnly)
                 {{ $getExtraTriggerAttributeBag()->class(['fi-fo-nepali-clock-time-picker-trigger']) }}>
                 <input x-ref="displaytext" @disabled($isDisabled) readonly placeholder="{{ $placeholder }}"
                     wire:key="{{ $livewireKey }}.display-text" x-model="displayText"
                     @if ($id = $getId()) id="{{ $id }}" @endif @class(['fi-fo-nepali-clock-time-picker-display-text-input']) />
             </button>
             <div x-ref="panel" x-cloak x-float.placement.bottom-start.offset.flip.shift="{ offset: 8 }" wire:ignore
-                wire:key="{{ $livewireKey }}.panel" @class(['fi-fo-nepali-clock-time-picker-panel'])>
+                wire:key="{{ $livewireKey }}.panel" role="dialog" aria-label="{{ $placeholder }}"
+                @class(['fi-fo-nepali-clock-time-picker-panel'])>
                 <div role="group" class="fi-fo-nepali-clock-time-picker-panel-header">
                     <div role="option" class="fi-fo-nepali-clock-time-picker-panel-header-tag" x-text="toNumber(hour)"
-                        x-on:click="setView('hour')" x-bind:area-selected="view === 'hour'"
+                        x-on:click="setView('hour')" x-bind:aria-selected="view === 'hour'"
                         x-bind:class="{
                             'fi-selected': view === 'hour',
                         }">
@@ -89,31 +93,42 @@
                     <div class="fi-fo-nepali-clock-time-picker-panel-header-divider">:</div>
                     <div role="option" class="fi-fo-nepali-clock-time-picker-panel-header-tag"
                         x-text="toNumber(minute)" x-on:click="setView('minute')"
-                        x-bind:area-selected="view === 'minute'"
+                        x-bind:aria-selected="view === 'minute'"
                         x-bind:class="{
                             'fi-selected': view === 'minute',
                         }">
                     </div>
                     @if ($hasSeconds)
                         <div class="fi-fo-nepali-clock-time-picker-panel-header-divider">:</div>
-                        <div class="fi-fo-nepali-clock-time-picker-panel-header-tag" x-text="toNumber(second)"
-                            x-on:click="setView('second')" x-bind:area-selected="view === 'second'"
+                        <div role="option" class="fi-fo-nepali-clock-time-picker-panel-header-tag"
+                            x-text="toNumber(second)" x-on:click="setView('second')"
+                            x-bind:aria-selected="view === 'second'"
                             x-bind:class="{
                                 'fi-selected': view === 'second',
                             }">
                         </div>
                     @endif
-                    <div class="fi-fo-nepali-clock-time-picker-panel-header-tag-off" x-text="meridian"></div>
+                    <div class="fi-fo-nepali-clock-time-picker-panel-header-tag-off" x-text="meridianLabel"></div>
                 </div>
 
                 <div class="fi-fo-nepali-clock-time-picker-clock-wrapper">
-                    <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock">
+                    <div x-ref="clock" class="fi-fo-nepali-clock-time-picker-clock"
+                        @dblclick.prevent="!isDragging && focusNextView(true)"
+                        @pointerdown.prevent="onDragClockHand($event); isDragging = true"
+                        @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false">
+                        <div class="fi-fo-nepali-clock-time-picker-clock-hand"
+                            :style="{ transform: `translate(-50%, -100%) rotate(${handangle}deg)` }">
+                            <div class="fi-fo-nepali-clock-time-picker-hand-indicator"></div>
+                        </div>
+                        <div class="fi-fo-nepali-clock-time-picker-clock-center-dot"></div>
+
+
                         <div x-show="view === 'hour'" x-transition>
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="h in getLength(12, 1)" x-bind:key="h">
                                     <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(h, 12)"
-                                        x-text="toNumber(h)" x-on:click="selectHour(h)"
+                                        x-text="toNumber(h)" x-on:click="selectHour(h)" role="option" tabindex="-1"
                                         x-bind:aria-selected="h === hour"
                                         x-bind:class="{
                                             'fi-selected': h === hour,
@@ -127,8 +142,9 @@
                             <div x-transition:enter.duration.500ms x-transition:leave.duration.400ms
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="m in getLength(60, 0)" x-bind:key="m">
-                                    <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(m, 60)"
-                                        x-text="m%5?'':toNumber(m)" x-on:click="selectMinute(m)"
+                                    <div class="fi-fo-nepali-clock-time-picker-clock-tag" x-show="m % minutesStep === 0"
+                                        :style="getMarkStyle(m, 60)" x-text="m%5?'':toNumber(m)"
+                                        x-on:click="selectMinute(m)" role="option" tabindex="-1"
                                         x-bind:aria-selected="m === minute"
                                         x-bind:class="{
                                             'fi-selected': m === minute,
@@ -144,8 +160,8 @@
                                 x-transition:enter.scale.80 x-transition:leave.scale.90>
                                 <template x-for="s in getLength(60, 0)" x-bind:key="s">
                                     <div class="fi-fo-nepali-clock-time-picker-clock-tag" :style="getMarkStyle(s, 60)"
-                                        x-text="s%5?'':toNumber(s)" x-on:click="selectSecond(s)"
-                                        x-bind:aria-selected="s === second"
+                                        x-text="s%5?'':toNumber(s)" x-on:click="selectSecond(s)" role="option"
+                                        tabindex="-1" x-bind:aria-selected="s === second"
                                         x-bind:class="{
                                             'fi-selected': s === second,
                                             'fi-disabled': secondDisabled(s),
@@ -155,12 +171,7 @@
                             </div>
                         </div>
 
-                        <div class="fi-fo-nepali-clock-time-picker-clock-hand" @pointerdown.prevent="isDragging = true"
-                            @pointermove.window="onDragClockHand($event)" @pointerup.window="isDragging = false"
-                            :style="{ transform: `translate(-50%, -100%) rotate(${handangle}deg)` }">
-                            <div class="fi-fo-nepali-clock-time-picker-hand-indicator"></div>
-                        </div>
-                        <div class="fi-fo-nepali-clock-time-picker-clock-center-dot"></div>
+
                     </div>
 
                     <div class="fi-fo-nepali-clock-time-picker-clock-meridian">

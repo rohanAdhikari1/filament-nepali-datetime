@@ -186,6 +186,8 @@ After setting up custom theme add the Clocktime picker css to your theme css fil
 @import '../../../../vendor/rohanadhikari/filament-nepali-datetime/resources/css/clock-time-picker.css';
 ```
 
+For full ClockTimePicker documentation, see [CLOCKTIMEPICKER.md](./CLOCKTIMEPICKER.md).
+
 #### Usage
 
 ```php
